@@ -13,7 +13,6 @@
             --bg-secondary: #13131e;
             --bg-card: #1a1a2e;
             --gold: #f5a623;
-            --gold-dark: #c47d0f;
             --gold-gradient: linear-gradient(135deg, #f5a623, #f7931e);
             --text-primary: #ffffff;
             --text-secondary: #9a9abf;
@@ -290,6 +289,12 @@
             font-weight: 400;
             text-align: center;
         }
+        .result-error {
+            color: #ef5350;
+            font-size: 14px;
+            font-weight: 400;
+            text-align: center;
+        }
         .result-direction {
             font-size: 44px;
             font-weight: 700;
@@ -393,7 +398,6 @@
 <body>
 <div class="container">
 
-    <!-- HEADER -->
     <div class="header">
         <div class="logo">
             <div class="logo-icon">✦</div>
@@ -402,7 +406,6 @@
         <span class="status-badge">LIVE</span>
     </div>
 
-    <!-- PRICE CARD -->
     <div class="price-card">
         <div class="price-top">
             <span class="price-label">Spot Price</span>
@@ -413,7 +416,6 @@
         <div class="price-update" id="update-time">обновлено: --:--</div>
     </div>
 
-    <!-- PAIR SELECTOR -->
     <div class="pair-selector" id="pair-selector">
         <button class="pair-btn active" data-pair="EURUSD">EURUSD</button>
         <button class="pair-btn" data-pair="GBPUSD">GBPUSD</button>
@@ -422,29 +424,24 @@
         <button class="pair-btn" data-pair="EURCHF">EUR/CHF <span class="otc">OTC</span></button>
     </div>
 
-    <!-- TF SELECTOR -->
     <div class="tf-selector">
         <button class="tf-btn active" data-tf="3">3 <span class="tf-label">сек</span></button>
         <button class="tf-btn" data-tf="5">5 <span class="tf-label">сек</span></button>
         <button class="tf-btn" data-tf="15">15 <span class="tf-label">сек</span></button>
     </div>
 
-    <!-- FORECAST BUTTON -->
     <button class="forecast-btn" id="forecast-btn">
         <span class="btn-icon">🚀</span> СДЕЛАТЬ ПРОГНОЗ
     </button>
 
-    <!-- RESULT CARD -->
     <div class="result-card" id="result-box">
         <div class="result-empty">Нажмите «Сделать прогноз»</div>
     </div>
 
-    <!-- LOG -->
     <div class="log-box" id="log-box">
         <div style="color:var(--text-muted); font-size:12px;">📋 История прогнозов</div>
     </div>
 
-    <!-- FOOTER -->
     <div class="footer">GOD FORECAST v2.0 · <span>AI</span> · реальные данные</div>
 </div>
 
@@ -458,7 +455,6 @@
     let isWaiting = false;
     let lastPrice = 1.2000;
 
-    // ===== UPDATE PRICE =====
     function updatePrice(price, pair) {
         if (price) {
             lastPrice = price;
@@ -470,7 +466,6 @@
         document.getElementById('update-time').textContent = 'обновлено: ' + new Date().toLocaleTimeString();
     }
 
-    // ===== PAIR SELECT =====
     document.querySelectorAll('.pair-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('active'));
@@ -481,7 +476,6 @@
         });
     });
 
-    // ===== TF SELECT =====
     document.querySelectorAll('.tf-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
@@ -490,47 +484,40 @@
         });
     });
 
-    // ===== FORECAST =====
+    // ===== ПОЛУЧЕНИЕ ПРОГНОЗА ОТ БОТА =====
     document.getElementById('forecast-btn').addEventListener('click', function() {
         if (isWaiting) return;
         this.innerHTML = '<span class="btn-icon">⏳</span> АНАЛИЗ...';
         this.disabled = true;
         isWaiting = true;
+
+        // Отправляем запрос боту
         tg.sendData(JSON.stringify({
             action: 'forecast',
             pair: currentPair,
             tf: currentTf
         }));
 
-        // Таймаут — чтобы кнопка не висела, если бот не отвечает (2 секунды)
-        setTimeout(function() {
+        // Таймаут 4 секунды — если бот не ответил, показываем ошибку
+        const timeoutId = setTimeout(function() {
             if (isWaiting) {
-                // Эмуляция прогноза, если бот не ответил
-                const dirs = ['UP', 'DOWN'];
-                const dir = dirs[Math.floor(Math.random() * 2)];
-                const prob = Math.floor(Math.random() * 30) + 60;
-                const rsi = (Math.random() * 40 + 30).toFixed(1);
-                const macd = (Math.random() * 0.01 - 0.005).toFixed(5);
-                const score = (Math.random() * 6 - 3).toFixed(1);
-                const volatility = (Math.random() * 2 + 0.5).toFixed(2);
-                showResult({
-                    direction: dir,
-                    probability: prob,
-                    rsi: rsi,
-                    macd: macd,
-                    score: score,
-                    volatility: volatility
-                });
+                const box = document.getElementById('result-box');
+                box.innerHTML = `
+                    <div class="result-error">⚠️ Ошибка: бот не ответил</div>
+                    <div style="color:var(--text-muted); font-size:12px; margin-top:6px;">Проверь, запущен ли бот</div>
+                `;
+                document.getElementById('forecast-btn').innerHTML = '<span class="btn-icon">🚀</span> СДЕЛАТЬ ПРОГНОЗ';
+                document.getElementById('forecast-btn').disabled = false;
                 isWaiting = false;
             }
-        }, 2500);
+        }, 4000);
     });
 
-    // ===== SHOW RESULT =====
+    // ===== ОТОБРАЖЕНИЕ РЕЗУЛЬТАТА =====
     function showResult(data) {
         const box = document.getElementById('result-box');
         if (!data || !data.direction) {
-            box.innerHTML = '<div class="result-empty">⚠️ Ошибка прогноза</div>';
+            box.innerHTML = '<div class="result-error">⚠️ Ошибка прогноза</div>';
             return;
         }
         const dir = data.direction === 'UP' ? '▲ ВВЕРХ' : '▼ ВНИЗ';
@@ -550,7 +537,6 @@
             </div>
         `;
 
-        // Log
         const time = new Date().toLocaleTimeString();
         logEntries.unshift({ time, pair: currentPair, tf: currentTf, direction: data.direction, prob });
         if (logEntries.length > 15) logEntries.pop();
@@ -561,7 +547,6 @@
         isWaiting = false;
     }
 
-    // ===== RENDER LOG =====
     function renderLog() {
         const box = document.getElementById('log-box');
         if (logEntries.length === 0) {
@@ -580,7 +565,7 @@
         box.innerHTML = html;
     }
 
-    // ===== AUTO PRICE UPDATE (DEMO) =====
+    // ===== АВТО-ОБНОВЛЕНИЕ ЦЕНЫ =====
     setInterval(() => {
         const change = (Math.random() - 0.5) * 0.002;
         let newPrice = lastPrice + change;
@@ -598,4 +583,4 @@
     console.log('✦ GOD FORECAST V2.0 LOADED');
 </script>
 </body>
-</html>
+    </html>

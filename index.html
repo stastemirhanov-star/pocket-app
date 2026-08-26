@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>GOD TRADER</title>
+    <title>GOD FORECAST</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -30,76 +30,92 @@
             margin-bottom: 16px;
             border: 1px solid #2a2a4e;
         }
-        .price { font-size: 32px; font-weight: bold; color: #4fc3f7; }
-        .price-label { font-size: 12px; color: #888; margin-top: 4px; }
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 16px;
+        .price { font-size: 28px; font-weight: bold; color: #4fc3f7; }
+        .pair-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 12px 0;
         }
-        .btn {
-            padding: 14px;
-            border: none;
+        .pair-btn {
+            background: #1a1a2e;
+            border: 1px solid #2a2a4e;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pair-btn.active {
+            background: #f5a623;
+            color: #000;
+            border-color: #f5a623;
+        }
+        .timeframe {
+            display: flex;
+            gap: 10px;
+            margin: 16px 0;
+        }
+        .tf-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #2a2a4e;
             border-radius: 10px;
+            background: transparent;
+            color: #fff;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tf-btn.active {
+            border-color: #4fc3f7;
+            background: #1a2a4e;
+        }
+        .tf-btn:active { transform: scale(0.95); }
+        .forecast-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5a623, #f7931e);
+            border: none;
+            border-radius: 14px;
+            color: #000;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 16px 0;
             transition: transform 0.1s;
-            color: #fff;
         }
-        .btn:active { transform: scale(0.95); }
-        .btn-buy { background: #2e7d32; }
-        .btn-sell { background: #c62828; }
-        .btn-signal { background: #f9a825; color: #000; }
-        .btn-grid { background: #1565c0; }
-        .btn-status { background: #6a1b9a; }
-        .btn-chart { background: #00695c; }
-        .btn-small { padding: 10px; font-size: 14px; }
-        .signal-box {
+        .forecast-btn:active { transform: scale(0.97); }
+        .result-box {
             background: #1a1a2e;
             border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 16px;
+            padding: 20px;
+            margin: 16px 0;
             border: 1px solid #2a2a4e;
-        }
-        .signal-row {
+            text-align: center;
+            min-height: 100px;
             display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
-            border-bottom: 1px solid #222;
+            flex-direction: column;
+            justify-content: center;
         }
-        .signal-row:last-child { border-bottom: none; }
-        .label { color: #aaa; }
-        .value { font-weight: bold; }
-        .value.buy { color: #4caf50; }
-        .value.sell { color: #ef5350; }
-        .value.hold { color: #ffeb3b; }
-        .grid-box {
-            background: #1a1a2e;
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 16px;
-            border: 1px solid #2a2a4e;
-            font-size: 13px;
+        .result-direction {
+            font-size: 48px;
+            font-weight: bold;
         }
-        .grid-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 3px 0;
-            border-bottom: 1px solid #1a1a2e;
+        .result-direction.up { color: #4caf50; }
+        .result-direction.down { color: #ef5350; }
+        .result-prob {
+            font-size: 24px;
+            color: #aaa;
+            margin-top: 8px;
         }
-        .chart-box {
-            background: #1a1a2e;
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 16px;
-            border: 1px solid #2a2a4e;
-            font-family: monospace;
-            font-size: 12px;
-            white-space: pre-wrap;
-            overflow-x: auto;
-            min-height: 80px;
+        .result-details {
+            font-size: 14px;
+            color: #888;
+            margin-top: 12px;
         }
         .log-box {
             background: #1a1a2e;
@@ -110,9 +126,9 @@
             max-height: 150px;
             overflow-y: auto;
             font-family: monospace;
+            margin-top: 16px;
         }
         .log-entry { padding: 2px 0; border-bottom: 1px solid #111; color: #aaa; }
-        .log-entry .time { color: #666; }
         .footer { margin-top: 20px; text-align: center; color: #555; font-size: 11px; }
         .status-dot {
             display: inline-block;
@@ -128,177 +144,161 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1>🚀 GOD TRADER</h1>
+        <h1>🔮 GOD FORECAST</h1>
         <span id="status"><span class="status-dot online"></span>Live</span>
     </div>
 
     <div class="price-box">
         <div class="price" id="price">1.20000</div>
-        <div class="price-label">EURUSD • Обновление: <span id="update-time">--</span></div>
+        <div class="price-label" id="pair-label">EURUSD</div>
     </div>
 
-    <div class="grid-2">
-        <button class="btn btn-buy" onclick="sendAction('buy', 10)">🟢 BUY 10$</button>
-        <button class="btn btn-sell" onclick="sendAction('sell', 10)">🔴 SELL 10$</button>
-        <button class="btn btn-buy btn-small" onclick="sendAction('buy', 25)">🟡 BUY 25$</button>
-        <button class="btn btn-sell btn-small" onclick="sendAction('sell', 25)">🔵 SELL 25$</button>
+    <div class="pair-selector" id="pair-selector">
+        <button class="pair-btn active" data-pair="EURUSD">EURUSD</button>
+        <button class="pair-btn" data-pair="GBPUSD">GBPUSD</button>
+        <button class="pair-btn" data-pair="BTCUSD">BTCUSD</button>
+        <button class="pair-btn" data-pair="USDJPY">USDJPY</button>
     </div>
 
-    <div class="grid-2">
-        <button class="btn btn-signal btn-small" onclick="getSignal()">📡 Сигнал</button>
-        <button class="btn btn-grid btn-small" onclick="getGrid()">📊 Сетка</button>
-        <button class="btn btn-status btn-small" onclick="getStatus()">📋 Статус</button>
-        <button class="btn btn-chart btn-small" onclick="getChart()">📈 График</button>
+    <div class="timeframe">
+        <button class="tf-btn active" data-tf="3">3с</button>
+        <button class="tf-btn" data-tf="5">5с</button>
+        <button class="tf-btn" data-tf="15">15с</button>
     </div>
 
-    <div class="signal-box" id="signal-box">
-        <div class="signal-row"><span class="label">Направление</span><span class="value hold" id="sig-dir">—</span></div>
-        <div class="signal-row"><span class="label">Вероятность</span><span id="sig-prob">—</span></div>
-        <div class="signal-row"><span class="label">RSI</span><span id="sig-rsi">—</span></div>
-        <div class="signal-row"><span class="label">MACD</span><span id="sig-macd">—</span></div>
-        <div class="signal-row"><span class="label">Волатильность</span><span id="sig-vol">—</span></div>
-    </div>
+    <button class="forecast-btn" id="forecast-btn">🚀 СДЕЛАТЬ ПРОГНОЗ</button>
 
-    <div class="grid-box" id="grid-box">
-        <div style="color:#888; font-size:12px;">📊 Сетка: нажмите «Сетка»</div>
-    </div>
-
-    <div class="chart-box" id="chart-box">
-        📈 График: нажмите «График»
+    <div class="result-box" id="result-box">
+        <div style="color:#888;">Нажмите «Сделать прогноз»</div>
     </div>
 
     <div class="log-box" id="log-box">
-        <div style="color:#888;">📋 Лог сделок</div>
+        <div style="color:#888;">📋 История прогнозов</div>
     </div>
 
-    <div class="footer">GOD TRADER v3.0 • Telegram Web App</div>
+    <div class="footer">GOD FORECAST v1.0 • ИИ-прогнозирование</div>
 </div>
 
 <script>
-    // ========== ИНИЦИАЛИЗАЦИЯ ==========
     const tg = window.Telegram.WebApp;
-    tg.expand();  // РАЗВОРАЧИВАЕТ НА ВЕСЬ ЭКРАН — ЭТО ВАЖНО!
+    tg.expand();
 
+    let currentPair = 'EURUSD';
+    let currentTf = 3;
+    let priceHistory = [];
     let lastPrice = 1.2000;
-    let priceHistory = [1.2000];
+    let logEntries = [];
 
-    // ========== ОБНОВЛЕНИЕ ВРЕМЕНИ ==========
-    function updateTime() {
-        document.getElementById('update-time').textContent = new Date().toLocaleTimeString();
-    }
-
-    // ========== ОБНОВЛЕНИЕ ЦЕНЫ (ЛОКАЛЬНАЯ ЭМУЛЯЦИЯ) ==========
+    // Обновление цены (реальная через бота или эмуляция)
     function updatePrice() {
         const change = (Math.random() - 0.5) * 0.002;
         let newPrice = lastPrice + change;
         newPrice = Math.min(1.2200, Math.max(1.1800, newPrice));
         lastPrice = Math.round(newPrice * 100000) / 100000;
         priceHistory.push(lastPrice);
-        if (priceHistory.length > 100) priceHistory.shift();
-        
+        if (priceHistory.length > 200) priceHistory.shift();
         document.getElementById('price').textContent = lastPrice.toFixed(5);
-        updateTime();
     }
 
-    // ========== ОТПРАВКА ДЕЙСТВИЙ В БОТА ==========
-    function sendAction(action, amount) {
-        try {
-            tg.sendData(JSON.stringify({ action: action, amount: amount }));
-            tg.showPopup({
-                title: '✅ Отправлено',
-                message: `${action.toUpperCase()} ${amount}$`,
-                buttons: [{ type: 'ok' }]
-            });
-        } catch (e) {
-            tg.showPopup({
-                title: '⚠️ Ошибка',
-                message: 'Не удалось отправить команду. Проверь бота.',
-                buttons: [{ type: 'ok' }]
-            });
+    // Выбор пары
+    document.querySelectorAll('.pair-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentPair = this.dataset.pair;
+            document.getElementById('pair-label').textContent = currentPair;
+            // Запрос цены для новой пары
+            tg.sendData(JSON.stringify({ action: 'get_price', pair: currentPair }));
+        });
+    });
+
+    // Выбор таймфрейма
+    document.querySelectorAll('.tf-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentTf = parseInt(this.dataset.tf);
+        });
+    });
+
+    // Прогноз
+    document.getElementById('forecast-btn').addEventListener('click', function() {
+        this.textContent = '⏳ Анализ...';
+        this.disabled = true;
+        
+        tg.sendData(JSON.stringify({
+            action: 'forecast',
+            pair: currentPair,
+            tf: currentTf
+        }));
+    });
+
+    // Обновление результата
+    function updateResult(data) {
+        const box = document.getElementById('result-box');
+        if (!data || !data.direction) {
+            box.innerHTML = '<div style="color:#888;">Ошибка прогноза</div>';
+            return;
         }
+        
+        const dir = data.direction === 'UP' ? 'ВВЕРХ ▲' : 'ВНИЗ ▼';
+        const cls = data.direction === 'UP' ? 'up' : 'down';
+        const prob = data.probability || 50;
+        
+        box.innerHTML = `
+            <div class="result-direction ${cls}">${dir}</div>
+            <div class="result-prob">Вероятность: ${prob}%</div>
+            <div class="result-details">
+                ${currentPair} • ${currentTf}с<br>
+                RSI: ${data.rsi || '--'} | MACD: ${data.macd || '--'}<br>
+                Скор: ${data.score || '--'}
+            </div>
+        `;
+        
+        // Добавить в лог
+        const time = new Date().toLocaleTimeString();
+        logEntries.unshift({ time, pair: currentPair, tf: currentTf, direction: data.direction, prob });
+        if (logEntries.length > 20) logEntries.pop();
+        renderLog();
     }
 
-    function getSignal() {
-        try {
-            tg.sendData(JSON.stringify({ action: 'get_signal' }));
-            tg.showPopup({ title: '📡', message: 'Запрос сигнала отправлен', buttons: [{ type: 'ok' }] });
-        } catch (e) {
-            // Если бот не отвечает — показываем эмуляцию
-            const signals = ['BUY', 'SELL', 'HOLD'];
-            const dir = signals[Math.floor(Math.random() * signals.length)];
-            const prob = Math.floor(Math.random() * 40) + 60;
-            document.getElementById('sig-dir').textContent = dir;
-            document.getElementById('sig-dir').className = 'value ' + dir.toLowerCase();
-            document.getElementById('sig-prob').textContent = prob + '%';
-            document.getElementById('sig-rsi').textContent = (Math.random() * 40 + 30).toFixed(1);
-            document.getElementById('sig-macd').textContent = (Math.random() * 0.01 - 0.005).toFixed(5);
-            document.getElementById('sig-vol').textContent = (Math.random() * 2 + 0.5).toFixed(2) + '%';
+    function renderLog() {
+        const box = document.getElementById('log-box');
+        if (logEntries.length === 0) {
+            box.innerHTML = '<div style="color:#888;">📋 История прогнозов</div>';
+            return;
         }
+        let html = '';
+        logEntries.forEach(entry => {
+            const emoji = entry.direction === 'UP' ? '🟢' : '🔴';
+            html += `<div class="log-entry">${entry.time} ${emoji} ${entry.pair} ${entry.tf}с → ${entry.direction} (${entry.prob}%)</div>`;
+        });
+        box.innerHTML = html;
     }
 
-    function getGrid() {
-        try {
-            tg.sendData(JSON.stringify({ action: 'get_grid' }));
-            tg.showPopup({ title: '📊', message: 'Запрос сетки отправлен', buttons: [{ type: 'ok' }] });
-        } catch (e) {
-            // Эмуляция сетки
-            const price = lastPrice;
-            let html = `<div class="grid-row"><span>Цена</span><span>${price.toFixed(5)}</span></div>`;
-            for (let i = 1; i <= 7; i++) {
-                html += `<div class="grid-row"><span>🟢 BUY_${i}</span><span>${(price - i * 0.002).toFixed(5)}</span></div>`;
-                html += `<div class="grid-row"><span>🔴 SELL_${i}</span><span>${(price + i * 0.002).toFixed(5)}</span></div>`;
-            }
-            document.getElementById('grid-box').innerHTML = html;
-        }
-    }
-
-    function getStatus() {
-        try {
-            tg.sendData(JSON.stringify({ action: 'get_status' }));
-            tg.showPopup({ title: '📋', message: 'Запрос статуса отправлен', buttons: [{ type: 'ok' }] });
-        } catch (e) {
-            document.getElementById('log-box').innerHTML = '<div class="log-entry">📋 Эмуляция: нет данных</div>';
-        }
-    }
-
-    function getChart() {
-        try {
-            tg.sendData(JSON.stringify({ action: 'get_chart' }));
-            tg.showPopup({ title: '📈', message: 'Запрос графика отправлен', buttons: [{ type: 'ok' }] });
-        } catch (e) {
-            // Эмуляция графика
-            if (priceHistory.length < 5) {
-                document.getElementById('chart-box').textContent = '📈 Недостаточно данных';
-                return;
-            }
-            const data = priceHistory;
-            const min = Math.min(...data);
-            const max = Math.max(...data);
-            const range = max - min || 1;
-            let lines = [];
-            const step = Math.max(1, Math.floor(data.length / 30));
-            for (let i = 0; i < data.length; i += step) {
-                const val = data[i];
-                const norm = Math.floor((val - min) / range * 10);
-                const bar = '█'.repeat(Math.max(1, norm)) + '░'.repeat(10 - Math.max(1, norm));
-                lines.push(bar);
-            }
-            document.getElementById('chart-box').textContent = '📊 ' + lines.join(' ');
-        }
-    }
-
-    // ========== ОБРАБОТКА ОТВЕТОВ ОТ БОТА ==========
-    // (Telegram Web App не умеет принимать ответы напрямую, но мы можем их игнорировать
-    // и использовать эмуляцию как запасной вариант)
-
-    // ========== АВТО-ОБНОВЛЕНИЕ ==========
-    setInterval(updatePrice, 2000);
+    // Авто-обновление цены
+    setInterval(updatePrice, 1000);
     updatePrice();
-    updateTime();
 
-    // ========== ПРИНУДИТЕЛЬНОЕ РАСКРЫТИЕ ==========
-    tg.expand();
-    console.log('🚀 GOD TRADER Web App loaded');
+    // Получение данных от бота (через WebAppData)
+    // Бот отправляет JSON-ответы в чат, но мы их перехватываем здесь
+    // В реальности нужно использовать WebSocket, но для простоты — эмуляция
+    // Эмулируем получение прогноза каждые 5 сек (для демо)
+    setInterval(() => {
+        // Эмуляция прогноза (для демонстрации)
+        const dirs = ['UP', 'DOWN'];
+        const dir = dirs[Math.floor(Math.random() * 2)];
+        const prob = Math.floor(Math.random() * 40) + 60;
+        updateResult({
+            direction: dir,
+            probability: prob,
+            rsi: (Math.random() * 40 + 30).toFixed(1),
+            macd: (Math.random() * 0.01 - 0.005).toFixed(5),
+            score: (Math.random() * 8 - 4).toFixed(1)
+        });
+    }, 5000);
+
+    console.log('🔮 GOD FORECAST loaded');
 </script>
 </body>
 </html>

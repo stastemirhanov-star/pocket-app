@@ -10,7 +10,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-primary: #0b0b12;
-            --bg-secondary: #13131e;
             --bg-card: #1a1a2e;
             --gold: #f5a623;
             --gold-gradient: linear-gradient(135deg, #f5a623, #f7931e);
@@ -289,12 +288,6 @@
             font-weight: 400;
             text-align: center;
         }
-        .result-error {
-            color: #ef5350;
-            font-size: 14px;
-            font-weight: 400;
-            text-align: center;
-        }
         .result-direction {
             font-size: 44px;
             font-weight: 700;
@@ -455,6 +448,12 @@
     let isWaiting = false;
     let lastPrice = 1.2000;
 
+    // ===== ОБРАБОТКА ОТВЕТА ОТ БОТА (ЧЕРЕЗ MAIN BUTTON) =====
+    // Telegram Web App не умеет принимать ответы напрямую,
+    // но мы можем использовать событие mainButtonClicked
+    // или просто ждать сообщение в чате.
+
+    // ===== ФУНКЦИЯ ОБНОВЛЕНИЯ ЦЕНЫ =====
     function updatePrice(price, pair) {
         if (price) {
             lastPrice = price;
@@ -466,6 +465,7 @@
         document.getElementById('update-time').textContent = 'обновлено: ' + new Date().toLocaleTimeString();
     }
 
+    // ===== ВЫБОР ПАРЫ =====
     document.querySelectorAll('.pair-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('active'));
@@ -476,6 +476,7 @@
         });
     });
 
+    // ===== ВЫБОР ТАЙМФРЕЙМА =====
     document.querySelectorAll('.tf-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
@@ -484,7 +485,7 @@
         });
     });
 
-    // ===== ПОЛУЧЕНИЕ ПРОГНОЗА ОТ БОТА =====
+    // ===== КНОПКА ПРОГНОЗА =====
     document.getElementById('forecast-btn').addEventListener('click', function() {
         if (isWaiting) return;
         this.innerHTML = '<span class="btn-icon">⏳</span> АНАЛИЗ...';
@@ -498,26 +499,27 @@
             tf: currentTf
         }));
 
-        // Таймаут 4 секунды — если бот не ответил, показываем ошибку
-        const timeoutId = setTimeout(function() {
+        // Ждём ответа от бота (он придёт как сообщение в чат, но мы его не видим)
+        // Вместо этого мы используем fallback: если через 5 секунд ответа нет — показываем ошибку
+        setTimeout(function() {
             if (isWaiting) {
                 const box = document.getElementById('result-box');
                 box.innerHTML = `
-                    <div class="result-error">⚠️ Ошибка: бот не ответил</div>
+                    <div style="color:#ef5350; font-size:14px;">⚠️ Бот не ответил</div>
                     <div style="color:var(--text-muted); font-size:12px; margin-top:6px;">Проверь, запущен ли бот</div>
                 `;
                 document.getElementById('forecast-btn').innerHTML = '<span class="btn-icon">🚀</span> СДЕЛАТЬ ПРОГНОЗ';
                 document.getElementById('forecast-btn').disabled = false;
                 isWaiting = false;
             }
-        }, 4000);
+        }, 5000);
     });
 
     // ===== ОТОБРАЖЕНИЕ РЕЗУЛЬТАТА =====
     function showResult(data) {
         const box = document.getElementById('result-box');
         if (!data || !data.direction) {
-            box.innerHTML = '<div class="result-error">⚠️ Ошибка прогноза</div>';
+            box.innerHTML = '<div style="color:#ef5350;">⚠️ Ошибка прогноза</div>';
             return;
         }
         const dir = data.direction === 'UP' ? '▲ ВВЕРХ' : '▼ ВНИЗ';
@@ -547,6 +549,7 @@
         isWaiting = false;
     }
 
+    // ===== ОБНОВЛЕНИЕ ЛОГА =====
     function renderLog() {
         const box = document.getElementById('log-box');
         if (logEntries.length === 0) {
@@ -558,29 +561,4 @@
             const cls = entry.direction === 'UP' ? 'dir-up' : 'dir-down';
             const emoji = entry.direction === 'UP' ? '🟢' : '🔴';
             html += `<div class="log-entry">
-                <span><span class="time">${entry.time}</span> ${emoji} ${entry.pair} ${entry.tf}с</span>
-                <span class="${cls}">${entry.direction} ${entry.prob}%</span>
-            </div>`;
-        });
-        box.innerHTML = html;
-    }
-
-    // ===== АВТО-ОБНОВЛЕНИЕ ЦЕНЫ =====
-    setInterval(() => {
-        const change = (Math.random() - 0.5) * 0.002;
-        let newPrice = lastPrice + change;
-        newPrice = Math.min(1.2200, Math.max(1.1800, newPrice));
-        lastPrice = Math.round(newPrice * 100000) / 100000;
-        document.getElementById('price').innerHTML = lastPrice.toFixed(5) + ' <small>USD</small>';
-        document.getElementById('update-time').textContent = 'обновлено: ' + new Date().toLocaleTimeString();
-        const changePercent = ((lastPrice / 1.2000 - 1) * 100).toFixed(2);
-        const el = document.getElementById('price-change');
-        el.textContent = (changePercent > 0 ? '+' : '') + changePercent + '%';
-        el.style.color = changePercent > 0 ? '#4caf50' : '#ef5350';
-        el.style.background = changePercent > 0 ? 'rgba(76,175,80,0.12)' : 'rgba(239,83,80,0.12)';
-    }, 3000);
-
-    console.log('✦ GOD FORECAST V2.0 LOADED');
-</script>
-</body>
-    </html>
+                <span><span class="time">${entry.time

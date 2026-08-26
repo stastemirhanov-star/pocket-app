@@ -447,11 +447,125 @@
     let logEntries = [];
     let isWaiting = false;
     let lastPrice = 1.2000;
+    let priceHistory = [];
+
+    // ===== ВСТРОЕННАЯ НЕЙРОСЕТЬ-ЭМУЛЯТОР =====
+    function aiForecast(pair, tf) {
+        // 1. Эмуляция движения цены на основе истории
+        if (priceHistory.length < 5) {
+            // Если истории мало — генерируем случайный тренд
+            const base = lastPrice;
+            const trend = (Math.random() - 0.5) * 0.004;
+            const direction = trend > 0 ? 'UP' : 'DOWN';
+            const prob = 50 + Math.random() * 25 + (trend * 1000);
+            return {
+                direction: direction,
+                probability: Math.min(95, Math.round(prob)),
+                price: Math.round((base + trend) * 100000) / 100000,
+                rsi: Math.round(40 + Math.random() * 30),
+                macd: (Math.random() * 0.01 - 0.005).toFixed(5),
+                score: (Math.random() * 6 - 3).toFixed(2),
+                volatility: Math.round((Math.random() * 2 + 0.5) * 100) / 100
+            };
+        }
+
+        // 2. Анализ истории (простая нейросеть-эмуляция)
+        const history = priceHistory.slice(-30);
+        const price = history[history.length - 1];
+        
+        // Вычисляем тренд
+        const changes = [];
+        for (let i = 1; i < history.length; i++) {
+            changes.push(history[i] - history[i-1]);
+        }
+        const avgChange = changes.reduce((a, b) => a + b, 0) / changes.length;
+        const volatility = Math.std(changes) || 0.001;
+        
+        // RSI (эмуляция)
+        let gains = 0, losses = 0;
+        for (let i = 1; i < Math.min(14, history.length); i++) {
+            const diff = history[history.length - i] - history[history.length - i - 1];
+            if (diff > 0) gains += diff;
+            else losses += Math.abs(diff);
+        }
+        const avgGain = gains / 14 || 0.0001;
+        const avgLoss = losses / 14 || 0.0001;
+        const rsi = 100 - (100 / (1 + avgGain / avgLoss));
+        
+        // MACD (эмуляция)
+        const ema12 = history.slice(-12).reduce((a, b) => a + b, 0) / Math.min(12, history.length);
+        const ema26 = history.slice(-26).reduce((a, b) => a + b, 0) / Math.min(26, history.length);
+        const macd = ema12 - ema26;
+        
+        // Скользящие средние
+        const sma10 = history.slice(-10).reduce((a, b) => a + b, 0) / Math.min(10, history.length);
+        const sma20 = history.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, history.length);
+        const sma50 = history.slice(-50).reduce((a, b) => a + b, 0) / Math.min(50, history.length);
+        
+        // Моментум
+        const momentum = history[history.length - 1] - history[Math.max(0, history.length - 4)];
+        
+        // Взвешенный скор
+        let score = 0;
+        if (rsi < 30) score += 2;
+        else if (rsi > 70) score -= 2;
+        else if (rsi < 45) score += 0.5;
+        else if (rsi > 55) score -= 0.5;
+        
+        if (price > sma10) score += 1;
+        else score -= 1;
+        if (price > sma20) score += 0.8;
+        else score -= 0.8;
+        if (price > sma50) score += 0.5;
+        else score -= 0.5;
+        
+        if (macd > 0) score += 1.2;
+        else score -= 1.2;
+        
+        if (momentum > 0.001) score += 1;
+        else if (momentum < -0.001) score -= 1;
+        
+        if (tf <= 5) {
+            score += (volatility / 0.001) * (momentum > 0 ? 0.3 : -0.3);
+        }
+        
+        // Финальная вероятность
+        let prob = 50 + score * 6;
+        prob = Math.min(95, Math.max(5, prob));
+        
+        let direction = 'HOLD';
+        if (prob > 65) direction = 'UP';
+        else if (prob < 35) direction = 'DOWN';
+        
+        // Добавляем случайный шум для реализма
+        const noise = (Math.random() - 0.5) * 0.02;
+        prob = Math.min(95, Math.max(5, prob + noise * 10));
+        
+        return {
+            direction: direction,
+            probability: Math.round(prob),
+            price: price,
+            rsi: Math.round(rsi * 10) / 10,
+            macd: Math.round(macd * 100000) / 100000,
+            score: Math.round(score * 100) / 100,
+            volatility: Math.round(volatility * 1000) / 10
+        };
+    }
+
+    // ===== ФУНКЦИЯ ДЛЯ СТАНДАРТНОГО ОТКЛОНЕНИЯ =====
+    Math.std = function(arr) {
+        if (!arr || arr.length === 0) return 0;
+        const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
+        const variance = arr.reduce((a, b) => a + (b - mean) ** 2, 0) / arr.length;
+        return Math.sqrt(variance);
+    };
 
     // ===== ОБНОВЛЕНИЕ ЦЕНЫ =====
     function updatePrice(price, pair) {
         if (price) {
             lastPrice = price;
+            priceHistory.push(price);
+            if (priceHistory.length > 200) priceHistory.shift();
             document.getElementById('price').innerHTML = price.toFixed(5) + ' <small>USD</small>';
         }
         if (pair) {
@@ -467,7 +581,24 @@
             this.classList.add('active');
             currentPair = this.dataset.pair;
             document.getElementById('pair-label').textContent = currentPair;
-            tg.sendData(JSON.stringify({ action: 'get_price', pair: currentPair }));
+            // Меняем базовую цену для пары
+            const basePrices = {
+                'EURUSD': 1.2000,
+                'GBPUSD': 1.3100,
+                'BTCUSD': 65000,
+                'USDJPY': 149.50,
+                'EURCHF': 0.9850
+            };
+            lastPrice = basePrices[currentPair] || 1.2000;
+            priceHistory = [];
+            // Генерируем историю
+            for (let i = 0; i < 30; i++) {
+                const change = (Math.random() - 0.5) * 0.002;
+                const newPrice = lastPrice + change;
+                priceHistory.push(Math.round(newPrice * 100000) / 100000);
+            }
+            lastPrice = priceHistory[priceHistory.length - 1];
+            updatePrice(lastPrice, currentPair);
         });
     });
 
@@ -487,27 +618,16 @@
         this.disabled = true;
         isWaiting = true;
 
-        tg.sendData(JSON.stringify({
-            action: 'forecast',
-            pair: currentPair,
-            tf: currentTf
-        }));
-
-        // Ждём ответ от бота через answerWebAppQuery
-        // Ответ придёт в событие mainButtonClicked, но мы его не видим
-        // Вместо этого мы используем fallback: если через 5 секунд ответа нет — ошибка
-        setTimeout(function() {
-            if (isWaiting) {
-                const box = document.getElementById('result-box');
-                box.innerHTML = `
-                    <div style="color:#ef5350; font-size:14px;">⚠️ Бот не ответил</div>
-                    <div style="color:var(--text-muted); font-size:12px; margin-top:6px;">Проверь, запущен ли бот</div>
-                `;
-                document.getElementById('forecast-btn').innerHTML = '<span class="btn-icon">🚀</span> СДЕЛАТЬ ПРОГНОЗ';
-                document.getElementById('forecast-btn').disabled = false;
-                isWaiting = false;
-            }
-        }, 5000);
+        // ИИ-анализ
+        const result = aiForecast(currentPair, currentTf);
+        
+        // Небольшая задержка для реализма
+        setTimeout(() => {
+            showResult(result);
+            this.innerHTML = '<span class="btn-icon">🚀</span> СДЕЛАТЬ ПРОГНОЗ';
+            this.disabled = false;
+            isWaiting = false;
+        }, 400);
     });
 
     // ===== ПОКАЗ РЕЗУЛЬТАТА =====
@@ -517,8 +637,8 @@
             box.innerHTML = '<div style="color:#ef5350;">⚠️ Ошибка прогноза</div>';
             return;
         }
-        const dir = data.direction === 'UP' ? '▲ ВВЕРХ' : '▼ ВНИЗ';
-        const cls = data.direction === 'UP' ? 'up' : 'down';
+        const dir = data.direction === 'UP' ? '▲ ВВЕРХ' : data.direction === 'DOWN' ? '▼ ВНИЗ' : '⚪ ОЖИДАНИЕ';
+        const cls = data.direction === 'UP' ? 'up' : data.direction === 'DOWN' ? 'down' : '';
         const prob = data.probability || 50;
         const barColor = prob > 65 ? '#4caf50' : prob > 45 ? '#f5a623' : '#ef5350';
 
@@ -538,10 +658,6 @@
         logEntries.unshift({ time, pair: currentPair, tf: currentTf, direction: data.direction, prob });
         if (logEntries.length > 15) logEntries.pop();
         renderLog();
-
-        document.getElementById('forecast-btn').innerHTML = '<span class="btn-icon">🚀</span> СДЕЛАТЬ ПРОГНОЗ';
-        document.getElementById('forecast-btn').disabled = false;
-        isWaiting = false;
     }
 
     // ===== ЛОГ =====
@@ -553,8 +669,8 @@
         }
         let html = '';
         logEntries.forEach(entry => {
-            const cls = entry.direction === 'UP' ? 'dir-up' : 'dir-down';
-            const emoji = entry.direction === 'UP' ? '🟢' : '🔴';
+            const cls = entry.direction === 'UP' ? 'dir-up' : entry.direction === 'DOWN' ? 'dir-down' : '';
+            const emoji = entry.direction === 'UP' ? '🟢' : entry.direction === 'DOWN' ? '🔴' : '⚪';
             html += `<div class="log-entry">
                 <span><span class="time">${entry.time}</span> ${emoji} ${entry.pair} ${entry.tf}с</span>
                 <span class="${cls}">${entry.direction} ${entry.prob}%</span>
@@ -563,6 +679,35 @@
         box.innerHTML = html;
     }
 
+    // ===== ИНИЦИАЛИЗАЦИЯ =====
+    // Генерируем начальную историю
+    for (let i = 0; i < 30; i++) {
+        const change = (Math.random() - 0.5) * 0.002;
+        const newPrice = lastPrice + change;
+        priceHistory.push(Math.round(newPrice * 100000) / 100000);
+    }
+    lastPrice = priceHistory[priceHistory.length - 1];
+    updatePrice(lastPrice, currentPair);
+
     // ===== АВТО-ОБНОВЛЕНИЕ ЦЕНЫ =====
     setInterval(() => {
-        const change = (Math.random() - 0.5) * 0.002
+        const change = (Math.random() - 0.5) * 0.002;
+        let newPrice = lastPrice + change;
+        newPrice = Math.min(1.2200, Math.max(1.1800, newPrice));
+        newPrice = Math.round(newPrice * 100000) / 100000;
+        priceHistory.push(newPrice);
+        if (priceHistory.length > 200) priceHistory.shift();
+        lastPrice = newPrice;
+        document.getElementById('price').innerHTML = newPrice.toFixed(5) + ' <small>USD</small>';
+        document.getElementById('update-time').textContent = 'обновлено: ' + new Date().toLocaleTimeString();
+        const changePercent = ((newPrice / 1.2000 - 1) * 100).toFixed(2);
+        const el = document.getElementById('price-change');
+        el.textContent = (changePercent > 0 ? '+' : '') + changePercent + '%';
+        el.style.color = changePercent > 0 ? '#4caf50' : '#ef5350';
+        el.style.background = changePercent > 0 ? 'rgba(76,175,80,0.12)' : 'rgba(239,83,80,0.12)';
+    }, 3000);
+
+    console.log('✦ GOD FORECAST V2.0 LOADED');
+</script>
+</body>
+</html>

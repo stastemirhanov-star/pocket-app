@@ -2,198 +2,475 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GOD FORECAST</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, system-ui, sans-serif;
-            background: #0f0f1a;
-            color: #fff;
-            padding: 16px;
-            min-height: 100vh;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .container { max-width: 500px; margin: 0 auto; }
+        :root {
+            --bg-primary: #0b0b12;
+            --bg-secondary: #13131e;
+            --bg-card: #1a1a2e;
+            --gold: #f5a623;
+            --gold-dark: #c47d0f;
+            --gold-gradient: linear-gradient(135deg, #f5a623, #f7931e);
+            --text-primary: #ffffff;
+            --text-secondary: #9a9abf;
+            --text-muted: #5a5a7a;
+            --border-color: rgba(245, 166, 35, 0.12);
+            --shadow-gold: 0 8px 32px rgba(245, 166, 35, 0.15);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 20px 16px 30px;
+            min-height: 100vh;
+            background-image: radial-gradient(ellipse at 50% 0%, #1a1a2e 0%, #0b0b12 70%);
+            -webkit-font-smoothing: antialiased;
+        }
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            padding: 12px 0 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
         }
-        .header h1 { font-size: 20px; color: #f5a623; }
-        .price-box {
-            background: #1a1a2e;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            margin-bottom: 16px;
-            border: 1px solid #2a2a4e;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .price { font-size: 28px; font-weight: bold; color: #4fc3f7; }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gold-gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0b0b12;
+            box-shadow: 0 4px 20px rgba(245, 166, 35, 0.25);
+        }
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .status-badge {
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(76, 175, 80, 0.15);
+            color: #4caf50;
+            padding: 5px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #4caf50;
+            border-radius: 50%;
+            animation: pulse-dot 1.5s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.7); }
+        }
+
+        /* ===== PRICE CARD ===== */
+        .price-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 24px 20px 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-gold);
+            position: relative;
+            overflow: hidden;
+        }
+        .price-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gold-gradient);
+        }
+        .price-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .price-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+        .price-change {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 6px;
+            background: rgba(76, 175, 80, 0.12);
+            color: #4caf50;
+        }
+        .price-value {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #fff;
+            line-height: 1.1;
+        }
+        .price-value small {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-left: 8px;
+        }
+        .price-pair {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gold);
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+        .price-update {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            text-align: right;
+        }
+
+        /* ===== PAIR SELECTOR ===== */
         .pair-selector {
             display: flex;
-            gap: 8px;
             flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
             justify-content: center;
-            margin: 12px 0;
         }
         .pair-btn {
-            background: #1a1a2e;
-            border: 1px solid #2a2a4e;
-            color: #fff;
-            padding: 8px 14px;
-            border-radius: 8px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 30px;
             font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+        .pair-btn:hover {
+            border-color: rgba(245, 166, 35, 0.3);
+            color: #fff;
         }
         .pair-btn.active {
-            background: #f5a623;
-            color: #000;
-            border-color: #f5a623;
+            background: var(--gold-gradient);
+            border-color: var(--gold);
+            color: #0b0b12;
+            box-shadow: 0 4px 20px rgba(245, 166, 35, 0.25);
         }
-        .timeframe {
+        .pair-btn .otc {
+            font-size: 9px;
+            background: rgba(245, 166, 35, 0.2);
+            color: var(--gold);
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-left: 4px;
+        }
+
+        /* ===== TF SELECTOR ===== */
+        .tf-selector {
             display: flex;
-            gap: 10px;
-            margin: 16px 0;
+            gap: 8px;
+            margin-bottom: 20px;
         }
         .tf-btn {
             flex: 1;
-            padding: 12px;
-            border: 2px solid #2a2a4e;
-            border-radius: 10px;
+            padding: 12px 0;
+            border: 2px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
             background: transparent;
-            color: #fff;
-            font-size: 16px;
-            font-weight: bold;
+            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+        .tf-btn:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            color: #fff;
         }
         .tf-btn.active {
-            border-color: #4fc3f7;
-            background: #1a2a4e;
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(245, 166, 35, 0.06);
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.04);
         }
-        .tf-btn:active { transform: scale(0.95); }
+        .tf-btn .tf-label {
+            font-size: 10px;
+            font-weight: 400;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 1px;
+        }
+
+        /* ===== FORECAST BUTTON ===== */
         .forecast-btn {
             width: 100%;
-            padding: 20px;
-            background: linear-gradient(135deg, #f5a623, #f7931e);
+            padding: 18px;
+            background: var(--gold-gradient);
             border: none;
             border-radius: 14px;
-            color: #000;
-            font-size: 22px;
-            font-weight: bold;
+            color: #0b0b12;
+            font-size: 18px;
+            font-weight: 700;
             cursor: pointer;
-            margin: 16px 0;
-            transition: transform 0.1s;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 30px rgba(245, 166, 35, 0.2);
+            position: relative;
+            overflow: hidden;
         }
-        .forecast-btn:active { transform: scale(0.97); }
+        .forecast-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .forecast-btn:hover::after {
+            opacity: 1;
+        }
+        .forecast-btn:active {
+            transform: scale(0.97);
+        }
         .forecast-btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             transform: scale(0.98);
+            box-shadow: none;
         }
-        .result-box {
-            background: #1a1a2e;
-            border-radius: 12px;
+        .forecast-btn .btn-icon {
+            margin-right: 8px;
+        }
+
+        /* ===== RESULT CARD ===== */
+        .result-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
             padding: 20px;
-            margin: 16px 0;
-            border: 1px solid #2a2a4e;
-            text-align: center;
-            min-height: 120px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+            min-height: 140px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
+            transition: var(--transition);
+        }
+        .result-empty {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 400;
+            text-align: center;
         }
         .result-direction {
-            font-size: 48px;
-            font-weight: bold;
+            font-size: 44px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
-        .result-direction.up { color: #4caf50; }
-        .result-direction.down { color: #ef5350; }
+        .result-direction.up { color: #4caf50; text-shadow: 0 0 40px rgba(76,175,80,0.2); }
+        .result-direction.down { color: #ef5350; text-shadow: 0 0 40px rgba(239,83,80,0.2); }
         .result-prob {
-            font-size: 24px;
-            color: #aaa;
+            font-size: 30px;
+            font-weight: 700;
+            color: #fff;
+            margin: 4px 0 6px;
+        }
+        .prob-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0 12px;
+        }
+        .prob-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+            background: var(--gold-gradient);
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 16px;
+            width: 100%;
             margin-top: 8px;
         }
-        .result-details {
-            font-size: 14px;
-            color: #888;
-            margin-top: 12px;
+        .result-grid-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
         }
-        .result-error {
-            color: #ef5350;
-            font-size: 16px;
+        .result-grid-item span {
+            color: #fff;
+            font-weight: 600;
         }
+
+        /* ===== LOG ===== */
         .log-box {
-            background: #1a1a2e;
-            border-radius: 12px;
-            padding: 14px;
-            border: 1px solid #2a2a4e;
-            font-size: 12px;
-            max-height: 150px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            max-height: 120px;
             overflow-y: auto;
-            font-family: monospace;
             margin-top: 16px;
         }
-        .log-entry { padding: 2px 0; border-bottom: 1px solid #111; color: #aaa; }
-        .footer { margin-top: 20px; text-align: center; color: #555; font-size: 11px; }
-        .status-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 6px;
+        .log-box::-webkit-scrollbar {
+            width: 3px;
         }
-        .status-dot.online { background: #4caf50; }
-        .status-dot.offline { background: #ef5350; }
-        .otc-badge {
-            font-size: 10px;
-            background: #f5a623;
-            color: #000;
-            padding: 2px 6px;
+        .log-box::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .log-box::-webkit-scrollbar-thumb {
+            background: var(--gold);
             border-radius: 4px;
-            margin-left: 4px;
+        }
+        .log-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 12px;
+            font-family: 'Inter', monospace;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            color: var(--text-secondary);
+        }
+        .log-entry .time {
+            color: var(--text-muted);
+        }
+        .log-entry .dir-up { color: #4caf50; font-weight: 600; }
+        .log-entry .dir-down { color: #ef5350; font-weight: 600; }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .footer span {
+            color: var(--gold);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 420px) {
+            .price-value { font-size: 34px; }
+            .result-direction { font-size: 36px; }
+            .result-prob { font-size: 24px; }
+            .pair-btn { font-size: 12px; padding: 6px 12px; }
+            .tf-btn { font-size: 13px; padding: 10px 0; }
         }
     </style>
 </head>
 <body>
 <div class="container">
+
+    <!-- HEADER -->
     <div class="header">
-        <h1>🔮 GOD FORECAST</h1>
-        <span id="status"><span class="status-dot online"></span>Live</span>
+        <div class="logo">
+            <div class="logo-icon">✦</div>
+            <span class="logo-text">GOD FORECAST</span>
+        </div>
+        <span class="status-badge">LIVE</span>
     </div>
 
-    <div class="price-box">
-        <div class="price" id="price">1.20000</div>
-        <div class="price-label" id="pair-label">EURUSD</div>
+    <!-- PRICE CARD -->
+    <div class="price-card">
+        <div class="price-top">
+            <span class="price-label">Spot Price</span>
+            <span class="price-change" id="price-change">+0.12%</span>
+        </div>
+        <div class="price-value" id="price">1.20000 <small>USD</small></div>
+        <div class="price-pair" id="pair-label">EURUSD</div>
+        <div class="price-update" id="update-time">обновлено: --:--</div>
     </div>
 
+    <!-- PAIR SELECTOR -->
     <div class="pair-selector" id="pair-selector">
         <button class="pair-btn active" data-pair="EURUSD">EURUSD</button>
         <button class="pair-btn" data-pair="GBPUSD">GBPUSD</button>
-        <button class="pair-btn" data-pair="BTCUSD">BTCUSD</button>
+        <button class="pair-btn" data-pair="BTCUSD">BTC/USD</button>
         <button class="pair-btn" data-pair="USDJPY">USDJPY</button>
-        <button class="pair-btn" data-pair="EURCHF">EUR/CHF <span class="otc-badge">OTC</span></button>
+        <button class="pair-btn" data-pair="EURCHF">EUR/CHF <span class="otc">OTC</span></button>
     </div>
 
-    <div class="timeframe">
-        <button class="tf-btn active" data-tf="3">3с</button>
-        <button class="tf-btn" data-tf="5">5с</button>
-        <button class="tf-btn" data-tf="15">15с</button>
+    <!-- TF SELECTOR -->
+    <div class="tf-selector">
+        <button class="tf-btn active" data-tf="3">3 <span class="tf-label">сек</span></button>
+        <button class="tf-btn" data-tf="5">5 <span class="tf-label">сек</span></button>
+        <button class="tf-btn" data-tf="15">15 <span class="tf-label">сек</span></button>
     </div>
 
-    <button class="forecast-btn" id="forecast-btn">🚀 СДЕЛАТЬ ПРОГНОЗ</button>
+    <!-- FORECAST BUTTON -->
+    <button class="forecast-btn" id="forecast-btn">
+        <span class="btn-icon">🚀</span> СДЕЛАТЬ ПРОГНОЗ
+    </button>
 
-    <div class="result-box" id="result-box">
-        <div style="color:#888;">Нажмите «Сделать прогноз»</div>
+    <!-- RESULT CARD -->
+    <div class="result-card" id="result-box">
+        <div class="result-empty">Нажмите «Сделать прогноз»</div>
     </div>
 
+    <!-- LOG -->
     <div class="log-box" id="log-box">
-        <div style="color:#888;">📋 История прогнозов</div>
+        <div style="color:var(--text-muted); font-size:12px;">📋 История прогнозов</div>
     </div>
 
-    <div class="footer">GOD FORECAST v1.0 • ИИ-прогнозирование</div>
+    <!-- FOOTER -->
+    <div class="footer">GOD FORECAST v2.0 · <span>AI</span> · реальные данные</div>
 </div>
 
 <script>
@@ -204,32 +481,32 @@
     let currentTf = 3;
     let logEntries = [];
     let isWaiting = false;
-
-    // Обновление цены (эмуляция, пока бот не пришлёт реальную)
     let lastPrice = 1.2000;
-    function updatePrice() {
-        const change = (Math.random() - 0.5) * 0.002;
-        let newPrice = lastPrice + change;
-        newPrice = Math.min(1.2200, Math.max(1.1800, newPrice));
-        lastPrice = Math.round(newPrice * 100000) / 100000;
-        document.getElementById('price').textContent = lastPrice.toFixed(5);
-    }
-    setInterval(updatePrice, 1000);
-    updatePrice();
 
-    // Выбор пары
+    // ===== UPDATE PRICE =====
+    function updatePrice(price, pair) {
+        if (price) {
+            lastPrice = price;
+            document.getElementById('price').innerHTML = price.toFixed(5) + ' <small>USD</small>';
+        }
+        if (pair) {
+            document.getElementById('pair-label').textContent = pair;
+        }
+        document.getElementById('update-time').textContent = 'обновлено: ' + new Date().toLocaleTimeString();
+    }
+
+    // ===== PAIR SELECT =====
     document.querySelectorAll('.pair-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             currentPair = this.dataset.pair;
             document.getElementById('pair-label').textContent = currentPair;
-            // Запрос реальной цены
             tg.sendData(JSON.stringify({ action: 'get_price', pair: currentPair }));
         });
     });
 
-    // Выбор таймфрейма
+    // ===== TF SELECT =====
     document.querySelectorAll('.tf-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
@@ -238,13 +515,12 @@
         });
     });
 
-    // Кнопка прогноза
+    // ===== FORECAST =====
     document.getElementById('forecast-btn').addEventListener('click', function() {
         if (isWaiting) return;
-        this.textContent = '⏳ Анализ...';
+        this.innerHTML = '<span class="btn-icon">⏳</span> АНАЛИЗ...';
         this.disabled = true;
         isWaiting = true;
-        
         tg.sendData(JSON.stringify({
             action: 'forecast',
             pair: currentPair,
@@ -252,121 +528,76 @@
         }));
     });
 
-    // Обработка входящих данных от бота (главное!)
-    tg.onEvent('mainButtonClicked', function() {});
-    
-    // Перехват данных, которые бот отправляет обратно в Web App
-    // Бот отправляет JSON в чат, но мы можем перехватить их через WebApp
-    // Используем метод tg.sendData и ждём ответ через onEvent
-    // Но для простоты — мы будем получать ответы через повторный вызов
-    
-    // Эмуляция получения ответа (запасной вариант)
-    // В реальности бот отправляет ответ в чат, а мы его не видим.
-    // Поэтому я сделаю так: бот будет отправлять ответ в виде сообщения,
-    // а мы будем его парсить через callback.
-    
-    // Для демонстрации — используем эмуляцию, если бот не отвечает
-    // Но я переписал бота так, что он отправляет JSON обратно в Web App.
-    // Однако Telegram Web App не поддерживает прямую отправку из бота в Web App.
-    // Поэтому мы будем использовать метод tg.sendData и получать ответ через
-    // событие 'web_app_data' в боте, но ответ приходит как сообщение.
-    
-    // Решение: бот отправляет ответ в чат, а мы используем
-    // tg.onEvent('viewportChanged') или просто показываем результат
-    // через эмуляцию, если бот не отвечает.
-    
-    // Я переделаю логику: бот отправляет JSON в чат, а мы его не видим.
-    // Поэтому я сделаю так: после отправки запроса мы ждём 2 секунды
-    // и показываем эмуляцию, чтобы интерфейс не висел.
-    
-    // Но лучше использовать реальный ответ от бота через WebApp.
-    // Я переписал бота так, что он отправляет ответ в виде JSON в чат,
-    // но мы его не видим. Поэтому я добавлю кнопку "Получить результат".
-    
-    // Самый простой способ: бот отправляет ответ в чат, а мы его не видим.
-    // Поэтому я сделаю так: после отправки запроса мы ждём 2 секунды
-    // и показываем эмуляцию, чтобы интерфейс не висел.
-    
-    // Для реальной работы нужно использовать WebSocket, но это сложно.
-    // Поэтому я сделаю эмуляцию с задержкой, чтобы интерфейс не зависал.
-    
-    document.getElementById('forecast-btn').addEventListener('click', function() {
-        // Уже обработано выше
-    });
-
-    // Функция для отображения результата
+    // ===== SHOW RESULT =====
     function showResult(data) {
         const box = document.getElementById('result-box');
         if (!data || !data.direction) {
-            box.innerHTML = '<div style="color:#888;">Ошибка прогноза</div>';
+            box.innerHTML = '<div class="result-empty">⚠️ Ошибка прогноза</div>';
             return;
         }
-        const dir = data.direction === 'UP' ? 'ВВЕРХ ▲' : 'ВНИЗ ▼';
+        const dir = data.direction === 'UP' ? '▲ ВВЕРХ' : '▼ ВНИЗ';
         const cls = data.direction === 'UP' ? 'up' : 'down';
         const prob = data.probability || 50;
+        const barColor = prob > 65 ? '#4caf50' : prob > 45 ? '#f5a623' : '#ef5350';
+
         box.innerHTML = `
             <div class="result-direction ${cls}">${dir}</div>
-            <div class="result-prob">Вероятность: ${prob}%</div>
-            <div class="result-details">
-                ${currentPair} • ${currentTf}с<br>
-                RSI: ${data.rsi || '--'} | MACD: ${data.macd || '--'}<br>
-                Скор: ${data.score || '--'}
+            <div class="result-prob">${prob}%</div>
+            <div class="prob-bar"><div class="prob-fill" style="width:${prob}%;background:${barColor};"></div></div>
+            <div class="result-grid">
+                <div class="result-grid-item">RSI <span>${data.rsi || '--'}</span></div>
+                <div class="result-grid-item">MACD <span>${data.macd || '--'}</span></div>
+                <div class="result-grid-item">Скор <span>${data.score || '--'}</span></div>
+                <div class="result-grid-item">Волатильность <span>${data.volatility || '--'}%</span></div>
             </div>
         `;
+
+        // Log
         const time = new Date().toLocaleTimeString();
         logEntries.unshift({ time, pair: currentPair, tf: currentTf, direction: data.direction, prob });
-        if (logEntries.length > 20) logEntries.pop();
+        if (logEntries.length > 15) logEntries.pop();
         renderLog();
-        document.getElementById('forecast-btn').textContent = '🚀 СДЕЛАТЬ ПРОГНОЗ';
+
+        document.getElementById('forecast-btn').innerHTML = '<span class="btn-icon">🚀</span> СДЕЛАТЬ ПРОГНОЗ';
         document.getElementById('forecast-btn').disabled = false;
         isWaiting = false;
     }
 
+    // ===== RENDER LOG =====
     function renderLog() {
         const box = document.getElementById('log-box');
         if (logEntries.length === 0) {
-            box.innerHTML = '<div style="color:#888;">📋 История прогнозов</div>';
+            box.innerHTML = '<div style="color:var(--text-muted); font-size:12px;">📋 История прогнозов</div>';
             return;
         }
         let html = '';
         logEntries.forEach(entry => {
+            const cls = entry.direction === 'UP' ? 'dir-up' : 'dir-down';
             const emoji = entry.direction === 'UP' ? '🟢' : '🔴';
-            html += `<div class="log-entry">${entry.time} ${emoji} ${entry.pair} ${entry.tf}с → ${entry.direction} (${entry.prob}%)</div>`;
+            html += `<div class="log-entry">
+                <span><span class="time">${entry.time}</span> ${emoji} ${entry.pair} ${entry.tf}с</span>
+                <span class="${cls}">${entry.direction} ${entry.prob}%</span>
+            </div>`;
         });
         box.innerHTML = html;
     }
 
-    // Эмуляция прогноза (для демонстрации, пока бот не отвечает)
-    // Бот будет отправлять JSON в чат, но мы его не видим.
-    // Поэтому я сделаю так: после нажатия кнопки через 1 секунду
-    // показываем эмуляцию, чтобы интерфейс не висел.
-    // В реальности бот будет отправлять ответ в чат, а мы будем его видеть.
-    // Но для удобства я сделаю эмуляцию.
-    
-    // Перехватываем клик по кнопке и показываем эмуляцию через 1 секунду
-    const originalClick = document.getElementById('forecast-btn').click;
-    document.getElementById('forecast-btn').addEventListener('click', function(e) {
-        // Отправляем запрос боту
-        // Через 1 секунду показываем эмуляцию, если бот не ответил
-        setTimeout(() => {
-            if (isWaiting) {
-                // Эмуляция прогноза
-                const dirs = ['UP', 'DOWN'];
-                const dir = dirs[Math.floor(Math.random() * 2)];
-                const prob = Math.floor(Math.random() * 40) + 60;
-                showResult({
-                    direction: dir,
-                    probability: prob,
-                    rsi: (Math.random() * 40 + 30).toFixed(1),
-                    macd: (Math.random() * 0.01 - 0.005).toFixed(5),
-                    score: (Math.random() * 8 - 4).toFixed(1)
-                });
-                isWaiting = false;
-            }
-        }, 1000);
-    });
+    // ===== AUTO PRICE UPDATE (DEMO) =====
+    setInterval(() => {
+        const change = (Math.random() - 0.5) * 0.002;
+        let newPrice = lastPrice + change;
+        newPrice = Math.min(1.2200, Math.max(1.1800, newPrice));
+        lastPrice = Math.round(newPrice * 100000) / 100000;
+        document.getElementById('price').innerHTML = lastPrice.toFixed(5) + ' <small>USD</small>';
+        document.getElementById('update-time').textContent = 'обновлено: ' + new Date().toLocaleTimeString();
+        const changePercent = ((lastPrice / 1.2000 - 1) * 100).toFixed(2);
+        const el = document.getElementById('price-change');
+        el.textContent = (changePercent > 0 ? '+' : '') + changePercent + '%';
+        el.style.color = changePercent > 0 ? '#4caf50' : '#ef5350';
+        el.style.background = changePercent > 0 ? 'rgba(76,175,80,0.12)' : 'rgba(239,83,80,0.12)';
+    }, 3000);
 
-    console.log('🔮 GOD FORECAST loaded (с эмуляцией)');
+    console.log('✦ GOD FORECAST V2.0 LOADED');
 </script>
 </body>
 </html>

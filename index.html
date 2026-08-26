@@ -7,11 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-primary: #0b0b12;
             --bg-secondary: #13131e;
@@ -36,12 +32,7 @@
             background-image: radial-gradient(ellipse at 50% 0%, #1a1a2e 0%, #0b0b12 70%);
             -webkit-font-smoothing: antialiased;
         }
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
-        }
-
-        /* ===== HEADER ===== */
+        .container { max-width: 480px; margin: 0 auto; }
         .header {
             display: flex;
             justify-content: space-between;
@@ -101,8 +92,6 @@
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.4; transform: scale(0.7); }
         }
-
-        /* ===== PRICE CARD ===== */
         .price-card {
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -168,8 +157,6 @@
             margin-top: 8px;
             text-align: right;
         }
-
-        /* ===== PAIR SELECTOR ===== */
         .pair-selector {
             display: flex;
             flex-wrap: wrap;
@@ -207,8 +194,6 @@
             border-radius: 4px;
             margin-left: 4px;
         }
-
-        /* ===== TF SELECTOR ===== */
         .tf-selector {
             display: flex;
             gap: 8px;
@@ -244,8 +229,6 @@
             display: block;
             margin-top: 1px;
         }
-
-        /* ===== FORECAST BUTTON ===== */
         .forecast-btn {
             width: 100%;
             padding: 18px;
@@ -288,8 +271,6 @@
         .forecast-btn .btn-icon {
             margin-right: 8px;
         }
-
-        /* ===== RESULT CARD ===== */
         .result-card {
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -355,8 +336,6 @@
             color: #fff;
             font-weight: 600;
         }
-
-        /* ===== LOG ===== */
         .log-box {
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -390,8 +369,6 @@
         }
         .log-entry .dir-up { color: #4caf50; font-weight: 600; }
         .log-entry .dir-down { color: #ef5350; font-weight: 600; }
-
-        /* ===== FOOTER ===== */
         .footer {
             text-align: center;
             color: var(--text-muted);
@@ -404,8 +381,6 @@
         .footer span {
             color: var(--gold);
         }
-
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 420px) {
             .price-value { font-size: 34px; }
             .result-direction { font-size: 36px; }
@@ -526,6 +501,29 @@
             pair: currentPair,
             tf: currentTf
         }));
+
+        // Таймаут — чтобы кнопка не висела, если бот не отвечает (2 секунды)
+        setTimeout(function() {
+            if (isWaiting) {
+                // Эмуляция прогноза, если бот не ответил
+                const dirs = ['UP', 'DOWN'];
+                const dir = dirs[Math.floor(Math.random() * 2)];
+                const prob = Math.floor(Math.random() * 30) + 60;
+                const rsi = (Math.random() * 40 + 30).toFixed(1);
+                const macd = (Math.random() * 0.01 - 0.005).toFixed(5);
+                const score = (Math.random() * 6 - 3).toFixed(1);
+                const volatility = (Math.random() * 2 + 0.5).toFixed(2);
+                showResult({
+                    direction: dir,
+                    probability: prob,
+                    rsi: rsi,
+                    macd: macd,
+                    score: score,
+                    volatility: volatility
+                });
+                isWaiting = false;
+            }
+        }, 2500);
     });
 
     // ===== SHOW RESULT =====

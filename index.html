@@ -493,7 +493,9 @@
             tf: currentTf
         }));
 
-        // Fallback: если бот не отвечает через 5 секунд
+        // Ждём ответ от бота через answerWebAppQuery
+        // Ответ придёт в событие mainButtonClicked, но мы его не видим
+        // Вместо этого мы используем fallback: если через 5 секунд ответа нет — ошибка
         setTimeout(function() {
             if (isWaiting) {
                 const box = document.getElementById('result-box');
@@ -563,20 +565,4 @@
 
     // ===== АВТО-ОБНОВЛЕНИЕ ЦЕНЫ =====
     setInterval(() => {
-        const change = (Math.random() - 0.5) * 0.002;
-        let newPrice = lastPrice + change;
-        newPrice = Math.min(1.2200, Math.max(1.1800, newPrice));
-        lastPrice = Math.round(newPrice * 100000) / 100000;
-        document.getElementById('price').innerHTML = lastPrice.toFixed(5) + ' <small>USD</small>';
-        document.getElementById('update-time').textContent = 'обновлено: ' + new Date().toLocaleTimeString();
-        const changePercent = ((lastPrice / 1.2000 - 1) * 100).toFixed(2);
-        const el = document.getElementById('price-change');
-        el.textContent = (changePercent > 0 ? '+' : '') + changePercent + '%';
-        el.style.color = changePercent > 0 ? '#4caf50' : '#ef5350';
-        el.style.background = changePercent > 0 ? 'rgba(76,175,80,0.12)' : 'rgba(239,83,80,0.12)';
-    }, 3000);
-
-    console.log('✦ GOD FORECAST V2.0 LOADED');
-</script>
-</body>
-</html>
+        const change = (Math.random() - 0.5) * 0.002

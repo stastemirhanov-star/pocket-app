@@ -246,7 +246,6 @@
         <span class="status-badge">LIVE</span>
     </div>
 
-    <!-- ВАЛЮТЫ -->
     <div class="pair-selector" id="pair-selector">
         <button class="pair-btn active" data-pair="EUR/USD">EUR/USD</button>
         <button class="pair-btn" data-pair="GBP/USD">GBP/USD</button>
@@ -260,7 +259,6 @@
         <button class="pair-btn" data-pair="USD/CAD">USD/CAD</button>
     </div>
 
-    <!-- ТАЙМФРЕЙМЫ -->
     <div class="tf-selector" id="tf-selector">
         <button class="tf-btn active" data-tf="3">3с</button>
         <button class="tf-btn" data-tf="5">5с</button>
@@ -271,19 +269,16 @@
         <button class="tf-btn" data-tf="900">15м</button>
     </div>
 
-    <!-- КНОПКА АНАЛИЗА -->
     <button class="forecast-btn" id="forecast-btn">
         <span class="btn-icon">📊</span> АНАЛИЗ
     </button>
 
-    <!-- РЕЗУЛЬТАТ -->
     <div class="result-card" id="result-box">
         <div style="color:var(--text-muted); text-align:center; padding:16px 0;">
             Выберите валюту и время → нажмите «Анализ»
         </div>
     </div>
 
-    <!-- ЛУЧШАЯ ВАЛЮТА -->
     <div class="best-pair-box" id="best-pair-box">
         <div class="title">🏆 ЛУЧШАЯ ВАЛЮТА ДЛЯ СДЕЛКИ</div>
         <div id="best-pair-list">
@@ -301,58 +296,64 @@
     let currentPair = 'EUR/USD';
     let currentTf = 3;
 
-    // ===== ВСЕ ВАЛЮТЫ =====
-    const allPairs = [
-        'EUR/USD', 'GBP/USD', 'USD/JPY', 'AUD/USD', 'USD/CHF',
-        'BTC/USD', 'ETH/USD', 'EUR/GBP', 'EUR/CHF', 'USD/CAD'
-    ];
+    // ===== БЭКЕНД (ТВОЙ IP) =====
+    const API_URL = 'http://192.168.1.122:5000';
 
-    // ===== ГЕНЕРАЦИЯ ПРОГНОЗА (ЭМУЛЯЦИЯ) =====
-    function generateSignal(pair, tf) {
+    // ===== ПОЛУЧИТЬ СИГНАЛ С БЭКЕНДА =====
+    async function getSignalFromBackend(pair, tf) {
+        try {
+            const response = await fetch(`${API_URL}/api/signal/${encodeURIComponent(pair)}`);
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            return data;
+        } catch (e) {
+            console.warn('Бэкенд не отвечает, использую эмуляцию:', e);
+            return null;
+        }
+    }
+
+    // ===== ПОЛУЧИТЬ ЛУЧШИЕ ВАЛЮТЫ =====
+    async function getBestPairs() {
+        try {
+            const response = await fetch(`${API_URL}/api/best`);
+            return await response.json();
+        } catch (e) {
+            console.warn('Не удалось получить лучшие валюты:', e);
+            return [];
+        }
+    }
+
+    // ===== ЭМУЛЯЦИЯ (если бэкенд не отвечает) =====
+    function generateEmulation(pair, tf) {
         const signals = ['BUY ▲', 'SELL ▼', 'HOLD ⚪'];
         const cls = ['buy', 'sell', 'hold'];
         const idx = Math.floor(Math.random() * 3);
-        const prob = Math.floor(Math.random() * 35) + 60;
-        const rsi = (Math.random() * 40 + 30).toFixed(1);
-        const macd = (Math.random() * 0.01 - 0.005).toFixed(5);
-        const score = (Math.random() * 6 - 3).toFixed(1);
-        const volatility = (Math.random() * 2 + 0.5).toFixed(2);
         const reasons = [
             'RSI=28.3 (перепроданность), цена выше SMA5, тренд вверх → BUY',
             'RSI=72.5 (перекупленность), цена ниже SMA20, тренд вниз → SELL',
             'RSI=52.0 (нейтрально), цена около SMA, тренд слабый → HOLD'
         ];
         return {
+            pair: pair,
+            price: (1.2000 + (Math.random() - 0.5) * 0.01).toFixed(5),
             direction: signals[idx],
             cls: cls[idx],
-            probability: prob,
-            rsi: rsi,
-            macd: macd,
-            score: score,
-            volatility: volatility,
+            probability: Math.floor(Math.random() * 35) + 60,
+            rsi: (Math.random() * 40 + 30).toFixed(1),
+            macd: (Math.random() * 0.01 - 0.005).toFixed(5),
+            score: (Math.random() * 6 - 3).toFixed(1),
+            volatility: (Math.random() * 2 + 0.5).toFixed(2),
             reason: reasons[idx % reasons.length],
-            price: (1.2000 + (Math.random() - 0.5) * 0.01).toFixed(5),
-            pair: pair,
             tf: tf
         };
-    }
-
-    // ===== АНАЛИЗ ВСЕХ ВАЛЮТ =====
-    function analyzeAllPairs() {
-        const results = [];
-        allPairs.forEach(pair => {
-            const sig = generateSignal(pair, 15);
-            results.push(sig);
-        });
-        return results;
     }
 
     // ===== ПОКАЗ РЕЗУЛЬТАТА =====
     function showResult(data) {
         const box = document.getElementById('result-box');
         const dir = data.direction;
-        const cls = data.cls;
-        const prob = data.probability;
+        const cls = data.cls || 'hold';
+        const prob = data.probability || 50;
 
         box.innerHTML = `
             <div class="result-row">
@@ -365,52 +366,51 @@
             </div>
             <div class="result-row">
                 <span class="result-label">⏱️ Таймфрейм</span>
-                <span class="result-value">${data.tf} сек</span>
+                <span class="result-value">${data.tf || currentTf} сек</span>
             </div>
             <div class="result-row">
                 <span class="result-label">💵 Цена</span>
-                <span class="result-value">${data.price}</span>
+                <span class="result-value">${data.price || '--'}</span>
             </div>
             <div class="result-row">
                 <span class="result-label">📈 RSI</span>
-                <span class="result-value">${data.rsi}</span>
+                <span class="result-value">${data.rsi || '--'}</span>
             </div>
             <div class="result-row">
                 <span class="result-label">📉 MACD</span>
-                <span class="result-value">${data.macd}</span>
+                <span class="result-value">${data.macd || '--'}</span>
             </div>
             <div class="result-row">
                 <span class="result-label">🎯 Скор</span>
-                <span class="result-value">${data.score}</span>
+                <span class="result-value">${data.score || '--'}</span>
             </div>
             <div class="result-reason">
-                <strong>Причина:</strong> ${data.reason}
+                <strong>Причина:</strong> ${data.reason || 'Нет данных'}
             </div>
         `;
     }
 
-    // ===== ЛУЧШАЯ ВАЛЮТА =====
-    function updateBestPairs() {
-        const results = analyzeAllPairs();
-        const sorted = results.sort((a, b) => {
-            const scoreA = a.direction.includes('BUY') ? a.probability : a.direction.includes('SELL') ? a.probability : 0;
-            const scoreB = b.direction.includes('BUY') ? b.probability : b.direction.includes('SELL') ? b.probability : 0;
-            return scoreB - scoreA;
-        });
-
-        const box = document.getElementById('best-pair-list');
-        let html = '';
-        sorted.slice(0, 5).forEach((item, index) => {
-            const emoji = item.direction.includes('BUY') ? '🟢' : item.direction.includes('SELL') ? '🔴' : '⚪';
-            const cls = item.direction.includes('BUY') ? 'best-signal-buy' : item.direction.includes('SELL') ? 'best-signal-sell' : '';
-            html += `
-                <div class="best-pair-item">
-                    <span>${index+1}. ${emoji} ${item.pair}</span>
-                    <span class="${cls}">${item.direction} (${item.probability}%)</span>
-                </div>
-            `;
-        });
-        box.innerHTML = html;
+    // ===== ОБНОВЛЕНИЕ ЛУЧШИХ ВАЛЮТ =====
+    async function updateBestPairs() {
+        const list = document.getElementById('best-pair-list');
+        try {
+            const data = await getBestPairs();
+            if (data.length === 0) throw new Error('Нет данных');
+            let html = '';
+            data.forEach((item, index) => {
+                const emoji = item.direction.includes('BUY') ? '🟢' : item.direction.includes('SELL') ? '🔴' : '⚪';
+                const cls = item.direction.includes('BUY') ? 'best-signal-buy' : item.direction.includes('SELL') ? 'best-signal-sell' : '';
+                html += `
+                    <div class="best-pair-item">
+                        <span>${index+1}. ${emoji} ${item.pair}</span>
+                        <span class="${cls}">${item.direction} (${item.probability}%)</span>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        } catch (e) {
+            list.innerHTML = '<div style="color:var(--text-muted); font-size:13px;">Бэкенд не доступен</div>';
+        }
     }
 
     // ===== ВЫБОР ПАРЫ =====
@@ -432,14 +432,17 @@
     });
 
     // ===== КНОПКА АНАЛИЗА =====
-    document.getElementById('forecast-btn').addEventListener('click', function() {
+    document.getElementById('forecast-btn').addEventListener('click', async function() {
         this.innerHTML = '⏳ АНАЛИЗ...';
         this.disabled = true;
 
-        const result = generateSignal(currentPair, currentTf);
-        showResult(result);
-
-        // Обновляем лучшие валюты
+        // Сначала пробуем бэкенд
+        let data = await getSignalFromBackend(currentPair, currentTf);
+        if (!data || data.error) {
+            // Если бэкенд не отвечает — используем эмуляцию
+            data = generateEmulation(currentPair, currentTf);
+        }
+        showResult(data);
         updateBestPairs();
 
         this.innerHTML = '📊 АНАЛИЗ';
@@ -448,9 +451,11 @@
 
     // ===== ПЕРВЫЙ ЗАПУСК =====
     updateBestPairs();
-    showResult(generateSignal('EUR/USD', 3));
+    // Показываем эмуляцию для первой загрузки
+    showResult(generateEmulation('EUR/USD', 3));
 
     console.log('✦ SAFRONIX GRAFICS v3.0 LOADED');
+    console.log('📡 Подключён к бэкенду:', API_URL);
 </script>
 </body>
 </html>

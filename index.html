@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SAFRONIX GRAFICS</title>
+    <title>SAFRONIX GRAFICS OTC</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
@@ -101,9 +101,9 @@
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.06);
             color: var(--text-secondary);
-            padding: 8px 14px;
+            padding: 6px 12px;
             border-radius: 30px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
@@ -241,22 +241,20 @@
     <div class="header">
         <div class="logo">
             <div class="logo-icon">✦</div>
-            <span class="logo-text">SAFRONIX GRAFICS</span>
+            <span class="logo-text">SAFRONIX GRAFICS OTC</span>
         </div>
         <span class="status-badge">LIVE</span>
     </div>
 
     <div class="pair-selector" id="pair-selector">
-        <button class="pair-btn active" data-pair="EUR/USD">EUR/USD</button>
-        <button class="pair-btn" data-pair="GBP/USD">GBP/USD</button>
-        <button class="pair-btn" data-pair="USD/JPY">USD/JPY</button>
-        <button class="pair-btn" data-pair="AUD/USD">AUD/USD</button>
-        <button class="pair-btn" data-pair="USD/CHF">USD/CHF</button>
-        <button class="pair-btn" data-pair="BTC/USD">BTC/USD</button>
-        <button class="pair-btn" data-pair="ETH/USD">ETH/USD</button>
-        <button class="pair-btn" data-pair="EUR/GBP">EUR/GBP</button>
-        <button class="pair-btn" data-pair="EUR/CHF">EUR/CHF</button>
-        <button class="pair-btn" data-pair="USD/CAD">USD/CAD</button>
+        <button class="pair-btn active" data-pair="EURUSD-OTC">EURUSD-OTC</button>
+        <button class="pair-btn" data-pair="GBPUSD-OTC">GBPUSD-OTC</button>
+        <button class="pair-btn" data-pair="USDJPY-OTC">USDJPY-OTC</button>
+        <button class="pair-btn" data-pair="BTCUSD-OTC">BTCUSD-OTC</button>
+        <button class="pair-btn" data-pair="ETHUSD-OTC">ETHUSD-OTC</button>
+        <button class="pair-btn" data-pair="XRPUSD-OTC">XRPUSD-OTC</button>
+        <button class="pair-btn" data-pair="LTCUSD-OTC">LTCUSD-OTC</button>
+        <button class="pair-btn" data-pair="DOGEUSD-OTC">DOGEUSD-OTC</button>
     </div>
 
     <div class="tf-selector" id="tf-selector">
@@ -286,20 +284,18 @@
         </div>
     </div>
 
-    <div class="footer">SAFRONIX GRAFICS v3.0 · <span>AI</span> · реальные данные</div>
+    <div class="footer">SAFRONIX GRAFICS OTC · <span>AI</span> · 24/7</div>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    let currentPair = 'EUR/USD';
+    let currentPair = 'EURUSD-OTC';
     let currentTf = 3;
 
-    // ===== БЭКЕНД (ТВОЙ IP) =====
     const API_URL = 'http://192.168.1.122:5000';
 
-    // ===== ПОЛУЧИТЬ СИГНАЛ С БЭКЕНДА =====
     async function getSignalFromBackend(pair, tf) {
         try {
             const response = await fetch(`${API_URL}/api/signal/${encodeURIComponent(pair)}`);
@@ -312,7 +308,6 @@
         }
     }
 
-    // ===== ПОЛУЧИТЬ ЛУЧШИЕ ВАЛЮТЫ =====
     async function getBestPairs() {
         try {
             const response = await fetch(`${API_URL}/api/best`);
@@ -323,7 +318,6 @@
         }
     }
 
-    // ===== ЭМУЛЯЦИЯ (если бэкенд не отвечает) =====
     function generateEmulation(pair, tf) {
         const signals = ['BUY ▲', 'SELL ▼', 'HOLD ⚪'];
         const cls = ['buy', 'sell', 'hold'];
@@ -342,13 +336,11 @@
             rsi: (Math.random() * 40 + 30).toFixed(1),
             macd: (Math.random() * 0.01 - 0.005).toFixed(5),
             score: (Math.random() * 6 - 3).toFixed(1),
-            volatility: (Math.random() * 2 + 0.5).toFixed(2),
             reason: reasons[idx % reasons.length],
             tf: tf
         };
     }
 
-    // ===== ПОКАЗ РЕЗУЛЬТАТА =====
     function showResult(data) {
         const box = document.getElementById('result-box');
         const dir = data.direction;
@@ -390,7 +382,6 @@
         `;
     }
 
-    // ===== ОБНОВЛЕНИЕ ЛУЧШИХ ВАЛЮТ =====
     async function updateBestPairs() {
         const list = document.getElementById('best-pair-list');
         try {
@@ -413,7 +404,6 @@
         }
     }
 
-    // ===== ВЫБОР ПАРЫ =====
     document.querySelectorAll('.pair-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('active'));
@@ -422,7 +412,6 @@
         });
     });
 
-    // ===== ВЫБОР ТАЙМФРЕЙМА =====
     document.querySelectorAll('.tf-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
@@ -431,15 +420,12 @@
         });
     });
 
-    // ===== КНОПКА АНАЛИЗА =====
     document.getElementById('forecast-btn').addEventListener('click', async function() {
         this.innerHTML = '⏳ АНАЛИЗ...';
         this.disabled = true;
 
-        // Сначала пробуем бэкенд
         let data = await getSignalFromBackend(currentPair, currentTf);
         if (!data || data.error) {
-            // Если бэкенд не отвечает — используем эмуляцию
             data = generateEmulation(currentPair, currentTf);
         }
         showResult(data);
@@ -449,13 +435,11 @@
         this.disabled = false;
     });
 
-    // ===== ПЕРВЫЙ ЗАПУСК =====
     updateBestPairs();
-    // Показываем эмуляцию для первой загрузки
-    showResult(generateEmulation('EUR/USD', 3));
+    showResult(generateEmulation('EURUSD-OTC', 3));
 
-    console.log('✦ SAFRONIX GRAFICS v3.0 LOADED');
+    console.log('✦ SAFRONIX GRAFICS OTC LOADED');
     console.log('📡 Подключён к бэкенду:', API_URL);
 </script>
 </body>
-</html>
+    </html>

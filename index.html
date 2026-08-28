@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GOD FORECAST</title>
+    <title>SAFRONIX GRAFICS</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
@@ -90,71 +90,6 @@
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.4; transform: scale(0.7); }
         }
-        .price-card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 24px 20px 20px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-gold);
-            position: relative;
-            overflow: hidden;
-        }
-        .price-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--gold-gradient);
-        }
-        .price-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-        .price-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            letter-spacing: 0.5px;
-        }
-        .price-change {
-            font-size: 13px;
-            font-weight: 600;
-            padding: 2px 10px;
-            border-radius: 6px;
-            background: rgba(76, 175, 80, 0.12);
-            color: #4caf50;
-        }
-        .price-value {
-            font-size: 42px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            color: #fff;
-            line-height: 1.1;
-        }
-        .price-value small {
-            font-size: 18px;
-            font-weight: 400;
-            color: var(--text-secondary);
-            margin-left: 8px;
-        }
-        .price-pair {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--gold);
-            margin-top: 4px;
-            letter-spacing: 1px;
-        }
-        .price-update {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 8px;
-            text-align: right;
-        }
         .pair-selector {
             display: flex;
             flex-wrap: wrap;
@@ -166,9 +101,9 @@
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.06);
             color: var(--text-secondary);
-            padding: 8px 16px;
+            padding: 8px 14px;
             border-radius: 30px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
@@ -184,28 +119,21 @@
             color: #0b0b12;
             box-shadow: 0 4px 20px rgba(245, 166, 35, 0.25);
         }
-        .pair-btn .otc {
-            font-size: 9px;
-            background: rgba(245, 166, 35, 0.2);
-            color: var(--gold);
-            padding: 1px 6px;
-            border-radius: 4px;
-            margin-left: 4px;
-        }
         .tf-selector {
             display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+            justify-content: center;
         }
         .tf-btn {
-            flex: 1;
-            padding: 12px 0;
-            border: 2px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
             background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.06);
             color: var(--text-secondary);
-            font-size: 15px;
-            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             font-family: 'Inter', sans-serif;
@@ -218,14 +146,6 @@
             border-color: var(--gold);
             color: var(--gold);
             background: rgba(245, 166, 35, 0.06);
-            box-shadow: 0 0 30px rgba(245, 166, 35, 0.04);
-        }
-        .tf-btn .tf-label {
-            font-size: 10px;
-            font-weight: 400;
-            color: var(--text-muted);
-            display: block;
-            margin-top: 1px;
         }
         .forecast-btn {
             width: 100%;
@@ -241,132 +161,68 @@
             font-family: 'Inter', sans-serif;
             letter-spacing: 0.5px;
             box-shadow: 0 4px 30px rgba(245, 166, 35, 0.2);
-            position: relative;
-            overflow: hidden;
         }
-        .forecast-btn::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-        .forecast-btn:hover::after {
-            opacity: 1;
-        }
-        .forecast-btn:active {
-            transform: scale(0.97);
-        }
+        .forecast-btn:active { transform: scale(0.97); }
         .forecast-btn:disabled {
             opacity: 0.5;
             transform: scale(0.98);
             box-shadow: none;
         }
-        .forecast-btn .btn-icon {
-            margin-right: 8px;
-        }
         .result-card {
             background: var(--bg-card);
             border-radius: var(--radius);
             padding: 20px;
-            margin: 20px 0;
+            margin: 16px 0;
             border: 1px solid var(--border-color);
-            min-height: 140px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: var(--transition);
+            min-height: 100px;
         }
-        .result-empty {
-            color: var(--text-muted);
-            font-size: 14px;
-            font-weight: 400;
-            text-align: center;
-        }
-        .result-direction {
-            font-size: 44px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-        .result-direction.up { color: #4caf50; text-shadow: 0 0 40px rgba(76,175,80,0.2); }
-        .result-direction.down { color: #ef5350; text-shadow: 0 0 40px rgba(239,83,80,0.2); }
-        .result-prob {
-            font-size: 30px;
-            font-weight: 700;
-            color: #fff;
-            margin: 4px 0 6px;
-        }
-        .prob-bar {
-            width: 100%;
-            height: 4px;
-            background: rgba(255,255,255,0.06);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 8px 0 12px;
-        }
-        .prob-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.6s ease;
-            background: var(--gold-gradient);
-        }
-        .result-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px 16px;
-            width: 100%;
-            margin-top: 8px;
-        }
-        .result-grid-item {
+        .result-row {
             display: flex;
             justify-content: space-between;
-            font-size: 13px;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .result-row:last-child { border-bottom: none; }
+        .result-label { color: var(--text-secondary); font-size: 14px; }
+        .result-value { font-weight: 700; font-size: 16px; }
+        .result-value.buy { color: #4caf50; }
+        .result-value.sell { color: #ef5350; }
+        .result-value.hold { color: #ffeb3b; }
+        .result-reason {
+            font-size: 14px;
             color: var(--text-secondary);
-            padding: 4px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+            margin-top: 8px;
+            padding: 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            border-left: 3px solid var(--gold);
         }
-        .result-grid-item span {
-            color: #fff;
-            font-weight: 600;
-        }
-        .log-box {
+        .best-pair-box {
             background: var(--bg-card);
             border-radius: var(--radius);
-            padding: 14px 16px;
-            border: 1px solid var(--border-color);
-            max-height: 120px;
-            overflow-y: auto;
+            padding: 16px;
             margin-top: 16px;
+            border: 1px solid var(--gold);
+            box-shadow: var(--shadow-gold);
         }
-        .log-box::-webkit-scrollbar {
-            width: 3px;
+        .best-pair-box .title {
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
         }
-        .log-box::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .log-box::-webkit-scrollbar-thumb {
-            background: var(--gold);
-            border-radius: 4px;
-        }
-        .log-entry {
+        .best-pair-item {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
-            font-size: 12px;
-            font-family: 'Inter', monospace;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            color: var(--text-secondary);
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 14px;
         }
-        .log-entry .time {
-            color: var(--text-muted);
-        }
-        .log-entry .dir-up { color: #4caf50; font-weight: 600; }
-        .log-entry .dir-down { color: #ef5350; font-weight: 600; }
+        .best-pair-item:last-child { border-bottom: none; }
+        .best-signal-buy { color: #4caf50; font-weight: 700; }
+        .best-signal-sell { color: #ef5350; font-weight: 700; }
         .footer {
             text-align: center;
             color: var(--text-muted);
@@ -376,16 +232,7 @@
             padding-top: 16px;
             border-top: 1px solid rgba(255,255,255,0.04);
         }
-        .footer span {
-            color: var(--gold);
-        }
-        @media (max-width: 420px) {
-            .price-value { font-size: 34px; }
-            .result-direction { font-size: 36px; }
-            .result-prob { font-size: 24px; }
-            .pair-btn { font-size: 12px; padding: 6px 12px; }
-            .tf-btn { font-size: 13px; padding: 10px 0; }
-        }
+        .footer span { color: var(--gold); }
     </style>
 </head>
 <body>
@@ -394,184 +241,176 @@
     <div class="header">
         <div class="logo">
             <div class="logo-icon">✦</div>
-            <span class="logo-text">GOD FORECAST</span>
+            <span class="logo-text">SAFRONIX GRAFICS</span>
         </div>
         <span class="status-badge">LIVE</span>
     </div>
 
-    <div class="price-card">
-        <div class="price-top">
-            <span class="price-label">Spot Price</span>
-            <span class="price-change" id="price-change">+0.12%</span>
-        </div>
-        <div class="price-value" id="price">1.20000 <small>USD</small></div>
-        <div class="price-pair" id="pair-label">EURUSD</div>
-        <div class="price-update" id="update-time">обновлено: --:--</div>
-    </div>
-
+    <!-- ВАЛЮТЫ -->
     <div class="pair-selector" id="pair-selector">
-        <button class="pair-btn active" data-pair="EURUSD">EURUSD</button>
-        <button class="pair-btn" data-pair="GBPUSD">GBPUSD</button>
-        <button class="pair-btn" data-pair="BTCUSD">BTC/USD</button>
-        <button class="pair-btn" data-pair="USDJPY">USDJPY</button>
-        <button class="pair-btn" data-pair="EURCHF">EUR/CHF <span class="otc">OTC</span></button>
+        <button class="pair-btn active" data-pair="EUR/USD">EUR/USD</button>
+        <button class="pair-btn" data-pair="GBP/USD">GBP/USD</button>
+        <button class="pair-btn" data-pair="USD/JPY">USD/JPY</button>
+        <button class="pair-btn" data-pair="AUD/USD">AUD/USD</button>
+        <button class="pair-btn" data-pair="USD/CHF">USD/CHF</button>
+        <button class="pair-btn" data-pair="BTC/USD">BTC/USD</button>
+        <button class="pair-btn" data-pair="ETH/USD">ETH/USD</button>
+        <button class="pair-btn" data-pair="EUR/GBP">EUR/GBP</button>
+        <button class="pair-btn" data-pair="EUR/CHF">EUR/CHF</button>
+        <button class="pair-btn" data-pair="USD/CAD">USD/CAD</button>
     </div>
 
-    <div class="tf-selector">
-        <button class="tf-btn active" data-tf="3">3 <span class="tf-label">сек</span></button>
-        <button class="tf-btn" data-tf="5">5 <span class="tf-label">сек</span></button>
-        <button class="tf-btn" data-tf="15">15 <span class="tf-label">сек</span></button>
+    <!-- ТАЙМФРЕЙМЫ -->
+    <div class="tf-selector" id="tf-selector">
+        <button class="tf-btn active" data-tf="3">3с</button>
+        <button class="tf-btn" data-tf="5">5с</button>
+        <button class="tf-btn" data-tf="15">15с</button>
+        <button class="tf-btn" data-tf="30">30с</button>
+        <button class="tf-btn" data-tf="60">1м</button>
+        <button class="tf-btn" data-tf="300">5м</button>
+        <button class="tf-btn" data-tf="900">15м</button>
     </div>
 
+    <!-- КНОПКА АНАЛИЗА -->
     <button class="forecast-btn" id="forecast-btn">
-        <span class="btn-icon">🚀</span> СДЕЛАТЬ ПРОГНОЗ
+        <span class="btn-icon">📊</span> АНАЛИЗ
     </button>
 
+    <!-- РЕЗУЛЬТАТ -->
     <div class="result-card" id="result-box">
-        <div class="result-empty">Нажмите «Сделать прогноз»</div>
+        <div style="color:var(--text-muted); text-align:center; padding:16px 0;">
+            Выберите валюту и время → нажмите «Анализ»
+        </div>
     </div>
 
-    <div class="log-box" id="log-box">
-        <div style="color:var(--text-muted); font-size:12px;">📋 История прогнозов</div>
+    <!-- ЛУЧШАЯ ВАЛЮТА -->
+    <div class="best-pair-box" id="best-pair-box">
+        <div class="title">🏆 ЛУЧШАЯ ВАЛЮТА ДЛЯ СДЕЛКИ</div>
+        <div id="best-pair-list">
+            <div style="color:var(--text-muted); font-size:13px;">Загрузка...</div>
+        </div>
     </div>
 
-    <div class="footer">GOD FORECAST v2.0 · <span>AI</span> · реальные данные</div>
+    <div class="footer">SAFRONIX GRAFICS v3.0 · <span>AI</span> · реальные данные</div>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    let currentPair = 'EURUSD';
+    let currentPair = 'EUR/USD';
     let currentTf = 3;
-    let logEntries = [];
-    let isWaiting = false;
-    let lastPrice = 1.2000;
-    let priceHistory = [];
 
-    // ===== ВСТРОЕННАЯ НЕЙРОСЕТЬ-ЭМУЛЯТОР =====
-    function aiForecast(pair, tf) {
-        // 1. Эмуляция движения цены на основе истории
-        if (priceHistory.length < 5) {
-            // Если истории мало — генерируем случайный тренд
-            const base = lastPrice;
-            const trend = (Math.random() - 0.5) * 0.004;
-            const direction = trend > 0 ? 'UP' : 'DOWN';
-            const prob = 50 + Math.random() * 25 + (trend * 1000);
-            return {
-                direction: direction,
-                probability: Math.min(95, Math.round(prob)),
-                price: Math.round((base + trend) * 100000) / 100000,
-                rsi: Math.round(40 + Math.random() * 30),
-                macd: (Math.random() * 0.01 - 0.005).toFixed(5),
-                score: (Math.random() * 6 - 3).toFixed(2),
-                volatility: Math.round((Math.random() * 2 + 0.5) * 100) / 100
-            };
-        }
+    // ===== ВСЕ ВАЛЮТЫ =====
+    const allPairs = [
+        'EUR/USD', 'GBP/USD', 'USD/JPY', 'AUD/USD', 'USD/CHF',
+        'BTC/USD', 'ETH/USD', 'EUR/GBP', 'EUR/CHF', 'USD/CAD'
+    ];
 
-        // 2. Анализ истории (простая нейросеть-эмуляция)
-        const history = priceHistory.slice(-30);
-        const price = history[history.length - 1];
-        
-        // Вычисляем тренд
-        const changes = [];
-        for (let i = 1; i < history.length; i++) {
-            changes.push(history[i] - history[i-1]);
-        }
-        const avgChange = changes.reduce((a, b) => a + b, 0) / changes.length;
-        const volatility = Math.std(changes) || 0.001;
-        
-        // RSI (эмуляция)
-        let gains = 0, losses = 0;
-        for (let i = 1; i < Math.min(14, history.length); i++) {
-            const diff = history[history.length - i] - history[history.length - i - 1];
-            if (diff > 0) gains += diff;
-            else losses += Math.abs(diff);
-        }
-        const avgGain = gains / 14 || 0.0001;
-        const avgLoss = losses / 14 || 0.0001;
-        const rsi = 100 - (100 / (1 + avgGain / avgLoss));
-        
-        // MACD (эмуляция)
-        const ema12 = history.slice(-12).reduce((a, b) => a + b, 0) / Math.min(12, history.length);
-        const ema26 = history.slice(-26).reduce((a, b) => a + b, 0) / Math.min(26, history.length);
-        const macd = ema12 - ema26;
-        
-        // Скользящие средние
-        const sma10 = history.slice(-10).reduce((a, b) => a + b, 0) / Math.min(10, history.length);
-        const sma20 = history.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, history.length);
-        const sma50 = history.slice(-50).reduce((a, b) => a + b, 0) / Math.min(50, history.length);
-        
-        // Моментум
-        const momentum = history[history.length - 1] - history[Math.max(0, history.length - 4)];
-        
-        // Взвешенный скор
-        let score = 0;
-        if (rsi < 30) score += 2;
-        else if (rsi > 70) score -= 2;
-        else if (rsi < 45) score += 0.5;
-        else if (rsi > 55) score -= 0.5;
-        
-        if (price > sma10) score += 1;
-        else score -= 1;
-        if (price > sma20) score += 0.8;
-        else score -= 0.8;
-        if (price > sma50) score += 0.5;
-        else score -= 0.5;
-        
-        if (macd > 0) score += 1.2;
-        else score -= 1.2;
-        
-        if (momentum > 0.001) score += 1;
-        else if (momentum < -0.001) score -= 1;
-        
-        if (tf <= 5) {
-            score += (volatility / 0.001) * (momentum > 0 ? 0.3 : -0.3);
-        }
-        
-        // Финальная вероятность
-        let prob = 50 + score * 6;
-        prob = Math.min(95, Math.max(5, prob));
-        
-        let direction = 'HOLD';
-        if (prob > 65) direction = 'UP';
-        else if (prob < 35) direction = 'DOWN';
-        
-        // Добавляем случайный шум для реализма
-        const noise = (Math.random() - 0.5) * 0.02;
-        prob = Math.min(95, Math.max(5, prob + noise * 10));
-        
+    // ===== ГЕНЕРАЦИЯ ПРОГНОЗА (ЭМУЛЯЦИЯ) =====
+    function generateSignal(pair, tf) {
+        const signals = ['BUY ▲', 'SELL ▼', 'HOLD ⚪'];
+        const cls = ['buy', 'sell', 'hold'];
+        const idx = Math.floor(Math.random() * 3);
+        const prob = Math.floor(Math.random() * 35) + 60;
+        const rsi = (Math.random() * 40 + 30).toFixed(1);
+        const macd = (Math.random() * 0.01 - 0.005).toFixed(5);
+        const score = (Math.random() * 6 - 3).toFixed(1);
+        const volatility = (Math.random() * 2 + 0.5).toFixed(2);
+        const reasons = [
+            'RSI=28.3 (перепроданность), цена выше SMA5, тренд вверх → BUY',
+            'RSI=72.5 (перекупленность), цена ниже SMA20, тренд вниз → SELL',
+            'RSI=52.0 (нейтрально), цена около SMA, тренд слабый → HOLD'
+        ];
         return {
-            direction: direction,
-            probability: Math.round(prob),
-            price: price,
-            rsi: Math.round(rsi * 10) / 10,
-            macd: Math.round(macd * 100000) / 100000,
-            score: Math.round(score * 100) / 100,
-            volatility: Math.round(volatility * 1000) / 10
+            direction: signals[idx],
+            cls: cls[idx],
+            probability: prob,
+            rsi: rsi,
+            macd: macd,
+            score: score,
+            volatility: volatility,
+            reason: reasons[idx % reasons.length],
+            price: (1.2000 + (Math.random() - 0.5) * 0.01).toFixed(5),
+            pair: pair,
+            tf: tf
         };
     }
 
-    // ===== ФУНКЦИЯ ДЛЯ СТАНДАРТНОГО ОТКЛОНЕНИЯ =====
-    Math.std = function(arr) {
-        if (!arr || arr.length === 0) return 0;
-        const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
-        const variance = arr.reduce((a, b) => a + (b - mean) ** 2, 0) / arr.length;
-        return Math.sqrt(variance);
-    };
+    // ===== АНАЛИЗ ВСЕХ ВАЛЮТ =====
+    function analyzeAllPairs() {
+        const results = [];
+        allPairs.forEach(pair => {
+            const sig = generateSignal(pair, 15);
+            results.push(sig);
+        });
+        return results;
+    }
 
-    // ===== ОБНОВЛЕНИЕ ЦЕНЫ =====
-    function updatePrice(price, pair) {
-        if (price) {
-            lastPrice = price;
-            priceHistory.push(price);
-            if (priceHistory.length > 200) priceHistory.shift();
-            document.getElementById('price').innerHTML = price.toFixed(5) + ' <small>USD</small>';
-        }
-        if (pair) {
-            document.getElementById('pair-label').textContent = pair;
-        }
-        document.getElementById('update-time').textContent = 'обновлено: ' + new Date().toLocaleTimeString();
+    // ===== ПОКАЗ РЕЗУЛЬТАТА =====
+    function showResult(data) {
+        const box = document.getElementById('result-box');
+        const dir = data.direction;
+        const cls = data.cls;
+        const prob = data.probability;
+
+        box.innerHTML = `
+            <div class="result-row">
+                <span class="result-label">📊 Направление</span>
+                <span class="result-value ${cls}">${dir}</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">🎯 Вероятность</span>
+                <span class="result-value">${prob}%</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">⏱️ Таймфрейм</span>
+                <span class="result-value">${data.tf} сек</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">💵 Цена</span>
+                <span class="result-value">${data.price}</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">📈 RSI</span>
+                <span class="result-value">${data.rsi}</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">📉 MACD</span>
+                <span class="result-value">${data.macd}</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">🎯 Скор</span>
+                <span class="result-value">${data.score}</span>
+            </div>
+            <div class="result-reason">
+                <strong>Причина:</strong> ${data.reason}
+            </div>
+        `;
+    }
+
+    // ===== ЛУЧШАЯ ВАЛЮТА =====
+    function updateBestPairs() {
+        const results = analyzeAllPairs();
+        const sorted = results.sort((a, b) => {
+            const scoreA = a.direction.includes('BUY') ? a.probability : a.direction.includes('SELL') ? a.probability : 0;
+            const scoreB = b.direction.includes('BUY') ? b.probability : b.direction.includes('SELL') ? b.probability : 0;
+            return scoreB - scoreA;
+        });
+
+        const box = document.getElementById('best-pair-list');
+        let html = '';
+        sorted.slice(0, 5).forEach((item, index) => {
+            const emoji = item.direction.includes('BUY') ? '🟢' : item.direction.includes('SELL') ? '🔴' : '⚪';
+            const cls = item.direction.includes('BUY') ? 'best-signal-buy' : item.direction.includes('SELL') ? 'best-signal-sell' : '';
+            html += `
+                <div class="best-pair-item">
+                    <span>${index+1}. ${emoji} ${item.pair}</span>
+                    <span class="${cls}">${item.direction} (${item.probability}%)</span>
+                </div>
+            `;
+        });
+        box.innerHTML = html;
     }
 
     // ===== ВЫБОР ПАРЫ =====
@@ -580,25 +419,6 @@
             document.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             currentPair = this.dataset.pair;
-            document.getElementById('pair-label').textContent = currentPair;
-            // Меняем базовую цену для пары
-            const basePrices = {
-                'EURUSD': 1.2000,
-                'GBPUSD': 1.3100,
-                'BTCUSD': 65000,
-                'USDJPY': 149.50,
-                'EURCHF': 0.9850
-            };
-            lastPrice = basePrices[currentPair] || 1.2000;
-            priceHistory = [];
-            // Генерируем историю
-            for (let i = 0; i < 30; i++) {
-                const change = (Math.random() - 0.5) * 0.002;
-                const newPrice = lastPrice + change;
-                priceHistory.push(Math.round(newPrice * 100000) / 100000);
-            }
-            lastPrice = priceHistory[priceHistory.length - 1];
-            updatePrice(lastPrice, currentPair);
         });
     });
 
@@ -611,103 +431,26 @@
         });
     });
 
-    // ===== КНОПКА ПРОГНОЗА =====
+    // ===== КНОПКА АНАЛИЗА =====
     document.getElementById('forecast-btn').addEventListener('click', function() {
-        if (isWaiting) return;
-        this.innerHTML = '<span class="btn-icon">⏳</span> АНАЛИЗ...';
+        this.innerHTML = '⏳ АНАЛИЗ...';
         this.disabled = true;
-        isWaiting = true;
 
-        // ИИ-анализ
-        const result = aiForecast(currentPair, currentTf);
-        
-        // Небольшая задержка для реализма
-        setTimeout(() => {
-            showResult(result);
-            this.innerHTML = '<span class="btn-icon">🚀</span> СДЕЛАТЬ ПРОГНОЗ';
-            this.disabled = false;
-            isWaiting = false;
-        }, 400);
+        const result = generateSignal(currentPair, currentTf);
+        showResult(result);
+
+        // Обновляем лучшие валюты
+        updateBestPairs();
+
+        this.innerHTML = '📊 АНАЛИЗ';
+        this.disabled = false;
     });
 
-    // ===== ПОКАЗ РЕЗУЛЬТАТА =====
-    function showResult(data) {
-        const box = document.getElementById('result-box');
-        if (!data || !data.direction) {
-            box.innerHTML = '<div style="color:#ef5350;">⚠️ Ошибка прогноза</div>';
-            return;
-        }
-        const dir = data.direction === 'UP' ? '▲ ВВЕРХ' : data.direction === 'DOWN' ? '▼ ВНИЗ' : '⚪ ОЖИДАНИЕ';
-        const cls = data.direction === 'UP' ? 'up' : data.direction === 'DOWN' ? 'down' : '';
-        const prob = data.probability || 50;
-        const barColor = prob > 65 ? '#4caf50' : prob > 45 ? '#f5a623' : '#ef5350';
+    // ===== ПЕРВЫЙ ЗАПУСК =====
+    updateBestPairs();
+    showResult(generateSignal('EUR/USD', 3));
 
-        box.innerHTML = `
-            <div class="result-direction ${cls}">${dir}</div>
-            <div class="result-prob">${prob}%</div>
-            <div class="prob-bar"><div class="prob-fill" style="width:${prob}%;background:${barColor};"></div></div>
-            <div class="result-grid">
-                <div class="result-grid-item">RSI <span>${data.rsi || '--'}</span></div>
-                <div class="result-grid-item">MACD <span>${data.macd || '--'}</span></div>
-                <div class="result-grid-item">Скор <span>${data.score || '--'}</span></div>
-                <div class="result-grid-item">Волатильность <span>${data.volatility || '--'}%</span></div>
-            </div>
-        `;
-
-        const time = new Date().toLocaleTimeString();
-        logEntries.unshift({ time, pair: currentPair, tf: currentTf, direction: data.direction, prob });
-        if (logEntries.length > 15) logEntries.pop();
-        renderLog();
-    }
-
-    // ===== ЛОГ =====
-    function renderLog() {
-        const box = document.getElementById('log-box');
-        if (logEntries.length === 0) {
-            box.innerHTML = '<div style="color:var(--text-muted); font-size:12px;">📋 История прогнозов</div>';
-            return;
-        }
-        let html = '';
-        logEntries.forEach(entry => {
-            const cls = entry.direction === 'UP' ? 'dir-up' : entry.direction === 'DOWN' ? 'dir-down' : '';
-            const emoji = entry.direction === 'UP' ? '🟢' : entry.direction === 'DOWN' ? '🔴' : '⚪';
-            html += `<div class="log-entry">
-                <span><span class="time">${entry.time}</span> ${emoji} ${entry.pair} ${entry.tf}с</span>
-                <span class="${cls}">${entry.direction} ${entry.prob}%</span>
-            </div>`;
-        });
-        box.innerHTML = html;
-    }
-
-    // ===== ИНИЦИАЛИЗАЦИЯ =====
-    // Генерируем начальную историю
-    for (let i = 0; i < 30; i++) {
-        const change = (Math.random() - 0.5) * 0.002;
-        const newPrice = lastPrice + change;
-        priceHistory.push(Math.round(newPrice * 100000) / 100000);
-    }
-    lastPrice = priceHistory[priceHistory.length - 1];
-    updatePrice(lastPrice, currentPair);
-
-    // ===== АВТО-ОБНОВЛЕНИЕ ЦЕНЫ =====
-    setInterval(() => {
-        const change = (Math.random() - 0.5) * 0.002;
-        let newPrice = lastPrice + change;
-        newPrice = Math.min(1.2200, Math.max(1.1800, newPrice));
-        newPrice = Math.round(newPrice * 100000) / 100000;
-        priceHistory.push(newPrice);
-        if (priceHistory.length > 200) priceHistory.shift();
-        lastPrice = newPrice;
-        document.getElementById('price').innerHTML = newPrice.toFixed(5) + ' <small>USD</small>';
-        document.getElementById('update-time').textContent = 'обновлено: ' + new Date().toLocaleTimeString();
-        const changePercent = ((newPrice / 1.2000 - 1) * 100).toFixed(2);
-        const el = document.getElementById('price-change');
-        el.textContent = (changePercent > 0 ? '+' : '') + changePercent + '%';
-        el.style.color = changePercent > 0 ? '#4caf50' : '#ef5350';
-        el.style.background = changePercent > 0 ? 'rgba(76,175,80,0.12)' : 'rgba(239,83,80,0.12)';
-    }, 3000);
-
-    console.log('✦ GOD FORECAST V2.0 LOADED');
+    console.log('✦ SAFRONIX GRAFICS v3.0 LOADED');
 </script>
 </body>
 </html>

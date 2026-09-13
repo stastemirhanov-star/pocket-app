@@ -1,425 +1,220 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
-    <title>Приват24 – офіційний інтерфейс</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        }
-        body {
-            background: #eef2f7;
-            color: #1a2332;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-        .app {
-            max-width: 1240px;
-            width: 100%;
-            background: #ffffff;
-            border-radius: 32px;
-            box-shadow: 0 20px 60px rgba(0,20,50,0.12);
-            padding: 28px 32px 24px;
-            border: 1px solid #d8e0eb;
-        }
-        /* хедер */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            border-bottom: 2px solid #e5ebf5;
-            padding-bottom: 16px;
-            margin-bottom: 24px;
-        }
-        .logo {
-            font-size: 28px;
-            font-weight: 800;
-            color: #0047ab;
-            letter-spacing: -0.5px;
-        }
-        .logo span { color: #f5b41a; }
-        .header-nav {
-            display: flex;
-            gap: 28px;
-            font-weight: 500;
-            font-size: 15px;
-        }
-        .header-nav a {
-            color: #1a2a4a;
-            text-decoration: none;
-            padding-bottom: 4px;
-            border-bottom: 3px solid transparent;
-        }
-        .header-nav a:hover { border-bottom-color: #0047ab; }
-        .header-right {
-            display: flex;
-            gap: 14px;
-            align-items: center;
-        }
-        .btn-blue {
-            background: #0047ab;
-            color: #fff;
-            border: none;
-            padding: 10px 26px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .btn-blue:hover { background: #003580; }
-        .btn-outline-blue {
-            background: transparent;
-            color: #0047ab;
-            border: 1px solid #0047ab;
-            padding: 9px 24px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .btn-outline-blue:hover { background: #eef4ff; }
-
-        /* основна сітка */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-top: 10px;
-        }
-        @media (max-width: 820px) {
-            .dashboard { grid-template-columns: 1fr; }
-            .header-nav { display: none; }
-        }
-
-        /* ліва частина – картка + баланс */
-        .card-section {
-            background: #f8faff;
-            border-radius: 28px;
-            padding: 24px 24px 20px;
-            border: 1px solid #dce4f0;
-        }
-        .card-section .label {
-            font-size: 13px;
-            color: #4a5a7a;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-        }
-        .card-section .balance-big {
-            font-size: 38px;
-            font-weight: 700;
-            color: #002a6b;
-            margin: 4px 0 12px;
-        }
-        .card-section .balance-big small {
-            font-size: 22px;
-            font-weight: 400;
-            color: #4a6a9a;
-        }
-        /* пластикова картка */
-        .plastic-card {
-            background: linear-gradient(145deg, #1a2f55, #0f1f3a);
-            border-radius: 24px;
-            padding: 22px 22px 18px;
-            margin: 16px 0 20px;
-            box-shadow: 0 10px 30px rgba(0,30,70,0.2);
-            border: 1px solid #3a5a8a;
-            color: #fff;
-            position: relative;
-            overflow: hidden;
-        }
-        .plastic-card::after {
-            content: '';
-            position: absolute;
-            top: -30%;
-            right: -10%;
-            width: 180px;
-            height: 180px;
-            background: radial-gradient(circle, rgba(255,215,0,0.06), transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-        .card-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-        }
-        .card-number {
-            font-size: 22px;
-            font-weight: 600;
-            letter-spacing: 3px;
-            font-family: 'Courier New', monospace;
-            margin: 10px 0 8px;
-        }
-        .card-number span { opacity: 0.5; margin-right: 6px; }
-        .card-details {
-            display: flex;
-            gap: 30px;
-            font-size: 12px;
-            color: #b0c8ec;
-        }
-        .card-details strong { color: #fff; font-weight: 600; display: block; margin-top: 2px; }
-        .card-actions-row {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-        .card-actions-row button {
-            padding: 8px 18px;
-            border-radius: 40px;
-            border: none;
-            background: #eef4ff;
-            color: #0047ab;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .card-actions-row button:hover { background: #dce6fc; }
-        .card-actions-row .gold-btn {
-            background: #f5b41a;
-            color: #002a6b;
-        }
-        .card-actions-row .gold-btn:hover { background: #e0a010; }
-
-        /* права частина – інформація */
-        .right-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .info-card {
-            background: #f8faff;
-            border-radius: 24px;
-            padding: 20px 22px;
-            border: 1px solid #dce4f0;
-        }
-        .info-card h4 {
-            font-size: 16px;
-            color: #002a6b;
-            margin-bottom: 12px;
-        }
-        .rate-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px 24px;
-        }
-        .rate-item {
-            font-weight: 600;
-            font-size: 15px;
-        }
-        .rate-item .green { color: #16a34a; }
-        .rate-item .red { color: #dc2626; }
-        .rate-item span { font-weight: 400; color: #2a3a5a; }
-
-        .transaction-list .tx {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #e5ebf5;
-            font-size: 14px;
-        }
-        .transaction-list .tx:last-child { border-bottom: none; }
-        .tx .desc { font-weight: 500; }
-        .tx .amount.positive { color: #16a34a; }
-        .tx .amount.negative { color: #dc2626; }
-        .tx .date { color: #5a6a8a; font-size: 12px; }
-
-        .quick-links {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .quick-links button {
-            padding: 12px 0;
-            border-radius: 40px;
-            border: 1px solid #dce4f0;
-            background: #fff;
-            font-weight: 600;
-            color: #002a6b;
-            cursor: pointer;
-            transition: 0.08s;
-        }
-        .quick-links button:hover {
-            background: #eef4ff;
-            border-color: #0047ab;
-        }
-
-        .footer-note {
-            margin-top: 28px;
-            padding-top: 18px;
-            border-top: 1px solid #dce4f0;
-            font-size: 13px;
-            color: #5a6a8a;
-            text-align: center;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>КП — Креслення кабінки запасних гравців</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    background: #eef1f5;
+    color: #1a1a1a;
+    line-height: 1.55;
+  }
+  .page {
+    max-width: 900px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 40px 50px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.08);
+    border-radius: 6px;
+  }
+  header {
+    border-bottom: 3px solid #0b5fa5;
+    padding-bottom: 16px;
+    margin-bottom: 28px;
+  }
+  h1 {
+    font-size: 24px;
+    color: #0b5fa5;
+    margin: 0 0 6px;
+  }
+  header .sub {
+    color: #555;
+    font-size: 14px;
+  }
+  h2 {
+    font-size: 18px;
+    color: #0b5fa5;
+    margin-top: 32px;
+    border-left: 4px solid #0b5fa5;
+    padding-left: 10px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid #ccd3db;
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #0b5fa5;
+    color: #fff;
+    font-weight: 600;
+  }
+  tr:nth-child(even) td { background: #f6f9fc; }
+  ul { padding-left: 20px; }
+  .highlight {
+    background: #fff8e1;
+    border-left: 4px solid #f5b800;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin: 16px 0;
+  }
+  .price {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0b5fa5;
+  }
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .card {
+    background: #f6f9fc;
+    border: 1px solid #dbe4ec;
+    border-radius: 6px;
+    padding: 14px 18px;
+  }
+  .card h3 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    color: #0b5fa5;
+  }
+  footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid #ccd3db;
+    font-size: 12px;
+    color: #777;
+    text-align: center;
+  }
+  @media print {
+    body { background: #fff; }
+    .page { box-shadow: none; margin: 0; padding: 20px; }
+  }
+</style>
 </head>
 <body>
-<div class="app">
-    <!-- хедер -->
-    <header class="header">
-        <div class="logo">Приват<span>24</span></div>
-        <nav class="header-nav">
-            <a href="#">Головна</a>
-            <a href="#">Карти</a>
-            <a href="#">Кредити</a>
-            <a href="#">Депозити</a>
-            <a href="#">Бізнес</a>
-        </nav>
-        <div class="header-right">
-            <button class="btn-outline-blue">Реєстрація</button>
-            <button class="btn-blue">Увійти</button>
-        </div>
-    </header>
+<div class="page">
 
-    <!-- дашборд -->
-    <div class="dashboard">
-        <!-- ліва частина: картка -->
-        <div class="card-section">
-            <div class="label">💳 Ваш баланс</div>
-            <div class="balance-big" id="balanceDisplay">1 248 760<small>.</small>50 ₴</div>
+  <header>
+    <h1>Комерційна пропозиція: комплект робочих 2D-креслень</h1>
+    <div class="sub">Кабінка для запасних гравців на стадіон + зварювальний цех · 18 місць · 3 монтажні секції</div>
+  </header>
 
-            <!-- пластикова картка -->
-            <div class="plastic-card">
-                <div class="card-row">
-                    <span style="font-size:24px;">💳</span>
-                    <span style="font-size:12px;background:rgba(255,255,255,0.08);padding:2px 12px;border-radius:20px;">UAH</span>
-                </div>
-                <div class="card-number"><span>****</span> 4578  <span>****</span> 1234</div>
-                <div class="card-details">
-                    <div>Термін <strong>12/27</strong></div>
-                    <div>Власник <strong>ІВАН ПЕТРЕНКО</strong></div>
-                    <div>CVV <strong>•••</strong></div>
-                </div>
-            </div>
+  <h2>1. Вихідні параметри об'єкта</h2>
+  <table>
+    <tr><th>Параметр</th><th>Значення</th></tr>
+    <tr><td>Габарити</td><td>9500 × 2300 × 2100 мм (Д × Г × В)</td></tr>
+    <tr><td>Місткість</td><td>18 сидінь (2 ряди × 9 місць)</td></tr>
+    <tr><td>Крок крісел</td><td>615 мм</td></tr>
+    <tr><td>Другий ряд</td><td>піднятий подіум +350 мм</td></tr>
+    <tr><td>Каркас</td><td>профтруба 80×40, 60×40, 40×20; гнуті арки купола</td></tr>
+    <tr><td>Обшивка</td><td>монолітний полікарбонат</td></tr>
+    <tr><td>Транспортабельність</td><td>3 секції на болтових фланцях (у стандартну вантажівку)</td></tr>
+  </table>
 
-            <!-- кнопки під карткою -->
-            <div class="card-actions-row">
-                <button class="gold-btn" id="showBalanceBtn">💰 Показати баланс</button>
-                <button id="lockCardBtn">🔒 Заблокувати</button>
-                <button id="cvvBtn">🔑 CVV</button>
-                <button id="resetBalanceBtn">↺ Скинути</button>
-            </div>
+  <h2>2. Склад комплекту документації</h2>
+  <table>
+    <tr>
+      <th>№</th><th>Документ</th><th>Зміст</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Складальне креслення (загальний вигляд)</td>
+      <td>Головний вигляд, вигляд збоку / переріз з радіусами гнуття та висотними відмітками, план рами</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Складальні креслення 3-х секцій</td>
+      <td>Секція A / B / C, вузли стикування на болтових фланцях</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Деталювання</td>
+      <td>Карти гнуття труб, пластини, фланці, кутники</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Відомість металопрокату та метизів</td>
+      <td>Специфікація з масами, кількістю, марками сталі</td>
+    </tr>
+  </table>
 
-            <!-- швидкі дії -->
-            <div style="margin-top:16px;">
-                <div class="quick-links">
-                    <button data-action="transfer">💸 Переказ</button>
-                    <button data-action="deposit">📱 Поповнити</button>
-                    <button data-action="pay">🧾 Оплата</button>
-                    <button data-action="history">📋 Історія</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- права частина -->
-        <div class="right-panel">
-            <!-- курси валют -->
-            <div class="info-card">
-                <h4>📊 Курси валют</h4>
-                <div class="rate-grid">
-                    <div class="rate-item">USD <span class="green">41.75</span> / <span class="red">42.30</span></div>
-                    <div class="rate-item">EUR <span class="green">45.20</span> / <span class="red">46.05</span></div>
-                    <div class="rate-item">PLN <span class="green">10.55</span> / <span class="red">10.95</span></div>
-                    <div class="rate-item">GBP <span class="green">53.80</span> / <span class="red">54.70</span></div>
-                    <div class="rate-item">BTC <span class="green">2 845 000</span></div>
-                </div>
-            </div>
-
-            <!-- останні транзакції -->
-            <div class="info-card transaction-list">
-                <h4>🔄 Останні операції</h4>
-                <div id="transactionsContainer">
-                    <div class="tx"><span class="desc">⬆️ Зарплата + бонус</span><span class="amount positive">+48 200,00 ₴</span><span class="date">сьогодні</span></div>
-                    <div class="tx"><span class="desc">⬇️ Оплата комунальних</span><span class="amount negative">-3 456,80 ₴</span><span class="date">вчора</span></div>
-                    <div class="tx"><span class="desc">🔄 Переказ на картку</span><span class="amount negative">-12 000,00 ₴</span><span class="date">вчора</span></div>
-                    <div class="tx"><span class="desc">💰 Кешбек 5%</span><span class="amount positive">+1 245,30 ₴</span><span class="date">2 дні тому</span></div>
-                </div>
-            </div>
-        </div>
+  <h2>3. Формати здачі</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Для цеху</h3>
+      <ul>
+        <li><b>PDF</b> — друковані креслення А3 / А2</li>
+        <li>Штамп, масштаби, розміри в мм</li>
+        <li>Окремі карти гнуття для трубогиба</li>
+      </ul>
     </div>
+    <div class="card">
+      <h3>Вихідні файли</h3>
+      <ul>
+        <li><b>DWG / DXF</b> — редаговані креслення</li>
+        <li>Сумісність: AutoCAD, BricsCAD, nanoCAD</li>
+        <li>Шари: каркас, обшивка, фланці, розміри</li>
+      </ul>
+    </div>
+  </div>
 
-    <div class="footer-note">ПриватБанк © 2026 · демонстраційний інтерфейс</div>
+  <h2>4. Програмне забезпечення</h2>
+  <table>
+    <tr><th>Задача</th><th>ПЗ</th></tr>
+    <tr><td>2D-креслення, складальні, деталювання</td><td>AutoCAD / BricsCAD</td></tr>
+    <tr><td>3D-контроль геометрії та стикувань (для самоперевірки)</td><td>SolidWorks або Fusion 360</td></tr>
+    <tr><td>Розгортки гнутих труб, карти гнуття</td><td>AutoCAD + власні шаблони розрахунку радіусів</td></tr>
+    <tr><td>Оформлення PDF</td><td>AutoCAD PDF / PDF24</td></tr>
+  </table>
+
+  <h2>5. Терміни та вартість</h2>
+  <div class="highlight">
+    <p><b>Термін виконання:</b> <span class="price">5 робочих днів</span></p>
+    <p style="margin:6px 0 0;">
+      • День 1–2: загальний вигляд + план рами, узгодження<br>
+      • День 3: секції A/B/C + вузли фланців<br>
+      • День 4: деталювання, карти гнуття<br>
+      • День 5: відомість металу, PDF + DWG/DXF, передача
+    </p>
+  </div>
+
+  <table>
+    <tr><th>Етап</th><th>Склад</th><th>Вартість, грн</th></tr>
+    <tr><td>Загальне складальне креслення</td><td>3 види + переріз + план</td><td>6 000</td></tr>
+    <tr><td>3 складальні секції</td><td>Вузли фланців, схеми болтів</td><td>9 000</td></tr>
+    <tr><td>Деталювання</td><td>Труби на гнуття + пластини + фланці</td><td>7 000</td></tr>
+    <tr><td>Відомість металу та метизів</td><td>Специфікація</td><td>2 000</td></tr>
+    <tr><td><b>Разом</b></td><td>PDF + DWG/DXF</td><td class="price">24 000</td></tr>
+  </table>
+
+  <p style="font-size:13px;color:#555;">
+    * Терміновість врахована. У разі зміни габаритів або кількості місць — перерахунок протягом 2 годин.
+    Передоплата 50%, решта — після передачі файлів.
+  </p>
+
+  <h2>6. Що потрібно від замовника для старту</h2>
+  <ul>
+    <li>Фото аналога (є)</li>
+    <li>Точні габарити та модель сидінь, креслення кріплення крісел (є частково — уточнити монтажні отвори)</li>
+    <li>Побажання щодо товщини полікарбонату (рекомендую 8 мм моноліт)</li>
+    <li>Місце стику секцій: A|B по 3500 мм, C — 2500 мм (або за вашим побажанням)</li>
+  </ul>
+
+  <footer>
+    Комерційна пропозиція дійсна 14 днів · Виконавець: інженер-конструктор, 2D/3D CAD
+  </footer>
+
 </div>
-
-<script>
-    (function() {
-        let balance = 124876050; // копійки
-
-        function fmt(c) {
-            const h = Math.floor(c/100);
-            const k = c%100;
-            return h.toLocaleString('uk-UA') + '<small>.</small>' + String(k).padStart(2,'0') + ' ₴';
-        }
-        function updateBalance() {
-            document.getElementById('balanceDisplay').innerHTML = fmt(balance);
-        }
-
-        function addTx(amount, desc, pos) {
-            const container = document.getElementById('transactionsContainer');
-            const d = new Date();
-            const ts = d.toLocaleDateString('uk-UA') + ' ' + d.toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit'});
-            const sign = pos ? '+' : '-';
-            const cls = pos ? 'positive' : 'negative';
-            const icon = pos ? '⬆️' : '⬇️';
-            const div = document.createElement('div');
-            div.className = 'tx';
-            div.innerHTML = `<span class="desc">${icon} ${desc}</span><span class="amount ${cls}">${sign} ${Math.abs(amount/100).toFixed(2).replace('.',',')} ₴</span><span class="date">${ts}</span>`;
-            container.prepend(div);
-        }
-
-        // кнопки
-        document.getElementById('showBalanceBtn').addEventListener('click', () => {
-            alert('💳 Баланс: ' + (balance/100).toFixed(2).replace('.',',') + ' ₴');
-        });
-        document.getElementById('lockCardBtn').addEventListener('click', () => {
-            if (confirm('🔒 Заблокувати картку?')) alert('✅ Картку заблоковано (демо)');
-        });
-        document.getElementById('cvvBtn').addEventListener('click', () => {
-            alert('🔑 CVV-код: *** (приховано)');
-        });
-        document.getElementById('resetBalanceBtn').addEventListener('click', () => {
-            balance = 124876050;
-            updateBalance();
-            addTx(0, 'Баланс скинуто', true);
-            alert('Баланс скинуто до 1 248 760,50 ₴');
-        });
-
-        // швидкі дії
-        document.querySelectorAll('.quick-links button').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const action = this.dataset.action;
-                const amount = prompt('Введіть суму (грн):', '500');
-                if (!amount) return;
-                const val = parseFloat(amount.replace(',', '.'));
-                if (isNaN(val) || val <= 0) { alert('❌ Некоректна сума'); return; }
-                const cents = Math.round(val * 100);
-                if (action === 'transfer' || action === 'pay') {
-                    if (cents > balance) { alert('❌ Недостатньо коштів'); return; }
-                    balance -= cents;
-                    addTx(-cents, action === 'transfer' ? 'Переказ' : 'Оплата', false);
-                    alert('✅ ' + (action === 'transfer' ? 'Переказ' : 'Оплата') + ' на ' + val.toFixed(2).replace('.',',') + ' ₴ виконано');
-                } else if (action === 'deposit') {
-                    balance += cents;
-                    addTx(cents, 'Поповнення', true);
-                    alert('✅ Поповнено на ' + val.toFixed(2).replace('.',',') + ' ₴');
-                } else if (action === 'history') {
-                    alert('📋 Історія операцій (демо)');
-                }
-                updateBalance();
-            });
-        });
-
-        updateBalance();
-    })();
-</script>
 </body>
 </html>
